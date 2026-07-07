@@ -1,0 +1,577 @@
+USE MASTER
+GO
+
+CREATE DATABASE Gestion_TomaInventario
+go
+
+use Gestion_TomaInventario
+go
+
+Create Table Empresa_GT
+(
+IdEmpresa BIGINT IDENTITY(1,1) primary key,
+CodEmpresa varchar(10),
+Ruc varchar(20),
+Nombre varchar(50),
+Estado bit,
+FechaRegistro datetime
+)
+go
+
+--ALTER TABLE Empresa_GT
+--ADD IdEmpresaOrigen INT;
+--GO --No sirve esto por el momento hasta que le demos un valor real quitar tambien del sp de inicio 
+
+
+
+ Create table ConfigLicencia_GT
+ (
+ IdConfig INT identity(1,1) primary key,
+ IdEmpresa bigint,
+ AlmacenesMax int,
+ UbicacionesMax int,
+ ProductosMax int,
+ UsuariosAdminMax int,
+ UsuariosOperadorMax int,
+ InventariosPreparadosMax int
+ 
+    constraint FK_ConfigLicencia_GT_Empresa_GT 
+        foreign Key(IdEmpresa)
+        references Empresa_GT(IdEmpresa)
+ )
+ Go
+
+ create table InstanciaCliente_GT
+ (
+ IdInstancia int identity(1,1) primary key,
+ IdEmpresa bigint,
+ NombreBD varchar(100),
+ ServidorSql varchar(100),
+ RutaWeb varchar(100),
+ Estado bit
+ 
+ Constraint FK_InstanciaCliente_GT_Empresa_GT
+    foreign Key(IdEmpresa)
+    references Empresa_GT(IdEmpresa)
+ 
+ )
+ go
+
+
+
+USE Gestion_TomaInventario
+GO
+
+DROP TABLE IF EXISTS AdminUsuario_GT;
+GO
+
+CREATE TABLE AdminUsuario_GT
+(
+    IdUsuario BIGINT IDENTITY(1,1) PRIMARY KEY,
+    IdEmpresa BIGINT NULL,
+
+    Usuario VARCHAR(50) NOT NULL,
+    PasswordHash VARCHAR(255) NOT NULL,
+    NombreCompleto VARCHAR(100),
+    EsSuperAdmin BIT NOT NULL DEFAULT(0),
+    Estado BIT NOT NULL DEFAULT(1),
+    FechaRegistro DATETIME NOT NULL DEFAULT(GETDATE())
+);
+go
+
+Select * From AdminUsuario_GT
+GO
+
+Insert into AdminUsuario_GT (IdEmpresa,Usuario,PasswordHash,NombreCompleto,EsSuperAdmin,Estado,FechaRegistro) values
+(0,'dmsMaster','dmsMaster','DMS Peru S.A.C.',1,1,GETDATE())
+GO
+
+CREATE OR ALTER PROCEDURE SP_ValidarLoginAdmin
+(
+    @Usuario VARCHAR(50),
+    @Contrasena VARCHAR(255)
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT TOP 1
+        IdUsuario,
+        IdEmpresa,
+        Usuario,
+        PasswordHash,
+        NombreCompleto,
+        EsSuperAdmin,
+        Estado,
+        FechaRegistro
+    FROM AdminUsuario_GT
+    WHERE Usuario = @Usuario
+      AND PasswordHash = @Contrasena
+      AND Estado = 1;
+END
+GO
+
+
+ Create procedure SP_ContarUsuariosBD
+ (
+    @NombreBD varchar(100)
+ )
+ as
+    begin
+       declare @SQL NVARCHAR(MAX)
+       
+       SET @SQL = 'SELECT COUNT(*) CantidadUsuarios FROM '+ QUOTENAME(@NombreBD) + '.dbo.ASF_USUARIO'
+       
+       exec sp_executesql @SQL
+    end
+    go
+
+        
+        --EXEC SP_ContarUsuariosBD 'INVENTARIO_2025'
+    -----------------------------------------------------------
+
+
+CREATE PROCEDURE SP_ResumenCliente
+(
+    @NombreBD VARCHAR(100)
+)
+AS
+BEGIN
+
+    DECLARE @SQL NVARCHAR(MAX)
+    -- comporbar mas cosas del cliente 
+    SET @SQL =
+    '
+    SELECT
+        (SELECT COUNT(*) FROM ' + QUOTENAME(@NombreBD) + '.dbo.ASF_USUARIO) Usuarios,
+        (SELECT COUNT(*) FROM ' + QUOTENAME(@NombreBD) + '.dbo.ASF_PRODUCTO) Productos,
+        (SELECT COUNT(*) FROM ' + QUOTENAME(@NombreBD) + '.dbo.ASF_UBICACION) Ubicaciones
+    '
+
+    EXEC sp_executesql @SQL
+
+END
+GO
+
+   EXEC SP_ResumenCliente'INVENTARIO_TOTTUS'
+   -- go
+
+
+   ----------------------------------------------------------------------
+
+
+alter PROCEDURE SP_SincronizarEmpresas
+AS
+BEGIN
+    SET NOCOUNT ON;
+    --generar tabla virtual
+    CREATE TABLE #Empresas
+    (
+        BaseDatos VARCHAR(128),
+        ID_EMPRESA INT,
+        COD_EMPRESA VARCHAR(50),
+        RUC_EMPRESA VARCHAR(20),
+        RAZONSOCIAL_EMPRESA VARCHAR(250),
+    
+        AlmacenesMax INT,
+        UbicacionesMax INT,
+        ProductosMax INT,
+        UsuariosAdminMax INT,
+        UsuariosOperadorMax INT,
+        InventariosPreparadosMax INT
+    );
+
+    -- inicializar variables de entrada
+    DECLARE @BD VARCHAR(128);
+    DECLARE @SQL NVARCHAR(MAX);
+
+    --hacer un cursor para recorrer todas las bd que enpiezen por INVENTARIO_
+    DECLARE cBD CURSOR FOR
+    SELECT name
+    FROM sys.databases
+    WHERE name LIKE 'INVENTARIO_%'
+      AND state = 0;
+
+      --abrimos cursor
+    OPEN cBD;
+
+    FETCH NEXT FROM cBD INTO @BD;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+    -- consulta interna en variable
+        SET @SQL = '
+        IF EXISTS (
+            SELECT 1
+            FROM [' + @BD + '].sys.tables
+            WHERE name = ''ASF_EMPRESA''
+        )
+        BEGIN
+
+            INSERT INTO #Empresas
+        (
+        BaseDatos,
+        ID_EMPRESA,
+        COD_EMPRESA,
+        RUC_EMPRESA,
+        RAZONSOCIAL_EMPRESA,
+        AlmacenesMax,
+        UbicacionesMax,
+        ProductosMax,
+        UsuariosAdminMax,
+        UsuariosOperadorMax,
+        InventariosPreparadosMax
+        )
+            SELECT
+                ''' + @BD + ''',
+                E.ID_EMPRESA,
+                E.COD_EMPRESA,
+                E.RUC_EMPRESA,
+                E.RAZONSOCIAL_EMPRESA,
+                L.AlmacenesMax,
+                L.UbicacionesMax,
+                L.ProductosMax,
+                L.UsuariosAdmiMax,
+                L.UsuariosOpeMax,
+                L.InventariosPreparadosMax
+                        FROM [' + @BD + '].dbo.ASF_EMPRESA E
+                        LEFT JOIN [' + @BD + '].dbo.ASF_CONFIG_LICENCIA L
+                    ON E.ID_EMPRESA = L.IdEmpresa
+        END';
+
+        BEGIN TRY
+        PRINT @SQL; -- ver 
+            EXEC(@SQL);
+        END TRY
+        BEGIN CATCH
+            PRINT 'Error leyendo BD: ' + @BD;
+        END CATCH
+
+        FETCH NEXT FROM cBD INTO @BD;
+    END
+
+    CLOSE cBD;
+    DEALLOCATE cBD;
+
+    SELECT
+    BaseDatos,
+    COD_EMPRESA,
+    AlmacenesMax,
+    UbicacionesMax,
+    ProductosMax
+FROM #Empresas
+
+SELECT *
+FROM #Empresas
+
+    -----------------------------------------------------
+    -- INSERTAR NUEVAS EMPRESAS
+    -----------------------------------------------------
+
+    INSERT INTO Empresa_GT
+(
+   
+    CodEmpresa,
+    Ruc,
+    Nombre,
+    Estado,
+    FechaRegistro
+)
+SELECT
+    
+    E.COD_EMPRESA,
+    E.RUC_EMPRESA,
+    E.RAZONSOCIAL_EMPRESA,
+    1,
+    GETDATE()
+FROM #Empresas E
+WHERE NOT EXISTS
+(
+    SELECT 1
+    FROM Empresa_GT G
+    WHERE G.Ruc = E.RUC_EMPRESA
+);
+
+    -----------------------------------------------------
+    -- REGISTRAR INSTANCIAS
+    -----------------------------------------------------
+
+    INSERT INTO InstanciaCliente_GT
+    (
+        IdEmpresa,
+        NombreBD,
+        ServidorSql,
+        RutaWeb,
+        Estado
+    )
+    SELECT
+        G.IdEmpresa,
+        E.BaseDatos,
+        @@SERVERNAME,
+        '',
+        1
+    FROM #Empresas E
+    INNER JOIN Empresa_GT G
+        ON G.Ruc = E.RUC_EMPRESA
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM InstanciaCliente_GT I
+        WHERE I.NombreBD = E.BaseDatos
+    );
+
+    -----------------------------------------------------
+    -- REGISTRAR EN LA BD LA LICENCIA POR PARTE DE CONFIG
+    -----------------------------------------------------
+    INSERT INTO ConfigLicencia_GT
+        (
+            IdEmpresa,
+            AlmacenesMax,
+            UbicacionesMax,
+            ProductosMax,
+            UsuariosAdminMax,
+            UsuariosOperadorMax,
+            InventariosPreparadosMax
+        )
+    SELECT
+            G.IdEmpresa,
+            E.AlmacenesMax,
+            E.UbicacionesMax,
+            E.ProductosMax,
+            E.UsuariosAdminMax,
+            E.UsuariosOperadorMax,
+            E.InventariosPreparadosMax
+        FROM #Empresas E
+            INNER JOIN Empresa_GT G
+        ON G.Ruc = E.RUC_EMPRESA
+            WHERE NOT EXISTS
+                (
+                    SELECT 1
+                    FROM ConfigLicencia_GT C
+                    WHERE C.IdEmpresa = G.IdEmpresa
+                );
+
+
+    ------------------------------------------------------
+    -- Actualizar licencias por medio de joins
+    ------------------------------------------------------
+
+    UPDATE C
+    SET
+        C.AlmacenesMax = E.AlmacenesMax,
+        C.UbicacionesMax = E.UbicacionesMax,
+        C.ProductosMax = E.ProductosMax,
+        C.UsuariosAdminMax = E.UsuariosAdminMax,
+        C.UsuariosOperadorMax = E.UsuariosOperadorMax,
+        C.InventariosPreparadosMax = E.InventariosPreparadosMax
+            FROM ConfigLicencia_GT C
+                INNER JOIN Empresa_GT G
+            ON C.IdEmpresa = G.IdEmpresa
+                INNER JOIN #Empresas E
+            ON G.Ruc = E.RUC_EMPRESA;
+    -----------------------------------------------------
+    -- RESULTADO
+    -----------------------------------------------------
+
+    SELECT
+        G.IdEmpresa,
+        G.CodEmpresa,
+        G.Ruc,
+        G.Nombre,
+        I.NombreBD
+    FROM Empresa_GT G
+    LEFT JOIN InstanciaCliente_GT I
+        ON G.IdEmpresa = I.IdEmpresa
+    ORDER BY G.Nombre;
+
+    --borrar tabla temporal
+    IF OBJECT_ID('tempdb..#Empresas') IS NOT NULL
+    DROP TABLE #Empresas;
+END
+GO
+
+
+EXEC SP_SincronizarEmpresas
+go
+
+
+
+SELECT *
+FROM INVENTARIO_2025.dbo.ASF_CONFIG_LICENCIA
+go
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------------------------------
+-- SP PROCEDIMIENTO PARA ENVIAR LOS CAMBIOS EFECTUADOS AL CLIENTE 
+-----------------------------------------------------------------
+
+CREATE OR ALTER PROCEDURE SP_ActualizarLicenciaCliente
+(
+    @IdEmpresa BIGINT
+)
+AS
+BEGIN
+
+    SET NOCOUNT ON;
+
+    DECLARE @NombreBD VARCHAR(100);
+--     DECLARE @IdEmpresaOrigen INT;
+
+    DECLARE @AlmacenesMax INT;
+    DECLARE @UbicacionesMax INT;
+    DECLARE @ProductosMax INT;
+    DECLARE @UsuariosAdminMax INT;
+    DECLARE @UsuariosOperadorMax INT;
+    DECLARE @InventariosPreparadosMax INT;
+
+    DECLARE @SQL NVARCHAR(MAX);
+
+    --------------------------------------------------
+    -- VALIDAR EMPRESA
+    --------------------------------------------------
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM Empresa_GT
+        WHERE IdEmpresa = @IdEmpresa
+    )
+    BEGIN
+        RAISERROR('Empresa no encontrada.',16,1);
+        RETURN;
+    END
+
+    --------------------------------------------------
+    -- OBTENER BD CLIENTE
+    --------------------------------------------------
+
+    SELECT
+    @NombreBD = I.NombreBD
+FROM InstanciaCliente_GT I
+WHERE I.IdEmpresa = @IdEmpresa;
+
+    IF @NombreBD IS NULL
+    BEGIN
+        RAISERROR('No existe instancia registrada.',16,1);
+        RETURN;
+    END
+
+    --------------------------------------------------
+    -- OBTENER LICENCIA MAESTRA
+    --------------------------------------------------
+
+    SELECT
+        @AlmacenesMax = AlmacenesMax,
+        @UbicacionesMax = UbicacionesMax,
+        @ProductosMax = ProductosMax,
+        @UsuariosAdminMax = UsuariosAdminMax,
+        @UsuariosOperadorMax = UsuariosOperadorMax,
+        @InventariosPreparadosMax = InventariosPreparadosMax
+    FROM ConfigLicencia_GT
+    WHERE IdEmpresa = @IdEmpresa;
+
+    --------------------------------------------------
+    -- ACTUALIZAR CLIENTE
+    --------------------------------------------------
+
+    SET @SQL = '
+UPDATE [' + @NombreBD + '].dbo.ASF_CONFIG_LICENCIA
+SET
+    AlmacenesMax = ' + CAST(@AlmacenesMax AS VARCHAR(20)) + ',
+    UbicacionesMax = ' + CAST(@UbicacionesMax AS VARCHAR(20)) + ',
+    ProductosMax = ' + CAST(@ProductosMax AS VARCHAR(20)) + ',
+    UsuariosAdmiMax = ' + CAST(@UsuariosAdminMax AS VARCHAR(20)) + ',
+    UsuariosOpeMax = ' + CAST(@UsuariosOperadorMax AS VARCHAR(20)) + ',
+    InventariosPreparadosMax = ' + CAST(@InventariosPreparadosMax AS VARCHAR(20)) + ';
+';
+    PRINT @SQL; -- ver
+    EXEC(@SQL);
+
+END
+GO
+
+EXEC SP_ActualizarLicenciaCliente 1;
+GO
+
+
+
+
+
+
+
+
+
+CREATE OR ALTER TRIGGER TR_ConfigLicencia_GT_Update
+ON ConfigLicencia_GT
+AFTER UPDATE
+AS
+BEGIN
+
+    SET NOCOUNT ON;
+
+    DECLARE @IdEmpresa BIGINT;
+
+    DECLARE c CURSOR FOR
+    SELECT DISTINCT IdEmpresa
+    FROM inserted;
+
+    OPEN c;
+
+    FETCH NEXT FROM c INTO @IdEmpresa;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+
+        EXEC SP_ActualizarLicenciaCliente @IdEmpresa;
+
+        FETCH NEXT FROM c INTO @IdEmpresa;
+
+    END
+
+    CLOSE c;
+    DEALLOCATE c;
+
+END
+GO
+
+
+
+
+
+
+
+-------------------------------------------
+
+--exec SP_SincronizarEmpresas
+----go
+
+
+----------------------------------------------
+
+--select * from InstanciaCliente_GT
+----go

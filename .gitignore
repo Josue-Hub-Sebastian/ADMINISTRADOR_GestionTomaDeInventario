@@ -1,0 +1,30 @@
+# Visual Studio
+.vs/
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# Packages
+packages/
+
+# Logs
+*.log
+
+# Publish
+publish/
+
+# IIS Express
+.vsconfig
+
+# Rider
+.idea/
+
+# Node
+node_modules/
+
+# Secrets
+appsettings.Development.json
+

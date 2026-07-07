@@ -1,0 +1,195 @@
+﻿/* ============================================
+   ESTILOS PARA EDITAR LICENCIA
+   ============================================ */
+
+/* Cards principales */
+.card-licencia {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+    .card-licencia:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+    }
+
+/* Headers con gradiente */
+.card-header-gradient {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    color: #fff;
+    border: none;
+}
+
+    .card-header-gradient.secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    }
+
+/* Inputs */
+.input-group-text {
+    background-color: #eef1fb;
+    border: none;
+    color: #4e73df;
+}
+
+.form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.15);
+}
+
+/* Badge de estado */
+.estado-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+    .estado-badge.activa {
+        background-color: #d4f4dd;
+        color: #1e7e34;
+    }
+
+    .estado-badge.inactiva {
+        background-color: #fbdcdc;
+        color: #c0392b;
+    }
+
+    .estado-badge i {
+        font-size: 0.9rem;
+    }
+
+/* Botón guardar */
+.btn-guardar {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .btn-guardar:hover {
+        transform: scale(1.03);
+        box-shadow: 0 6px 16px rgba(78, 115, 223, 0.35);
+    }
+
+/* Animaciones */
+.fade-in-up {
+    animation: fadeInUp 0.5s ease both;
+}
+
+    .fade-in-up:nth-of-type(2) {
+        animation-delay: 0.1s;
+    }
+
+    .fade-in-up:nth-of-type(3) {
+        animation-delay: 0.2s;
+    }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Contenedor del GIF del header */
+.gif-header-container {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f4fd;
+    border-radius: 10px;
+}
+
+/* Contenedor del GIF de estado */
+.gif-estado-container {
+    width: 100%;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #fafafa;
+    border: 1px dashed #e3e6f0;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* ============================================
+   MINI CARDS INFORMATIVAS
+   ============================================ */
+.mini-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px;
+    border: none;
+}
+
+    .mini-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+    }
+
+.mini-card-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 1.5rem;
+}
+
+    /* Colores suaves para iconos */
+    .mini-card-icon.bg-soft-primary {
+        background-color: rgba(78, 115, 223, 0.1);
+        color: #4e73df;
+    }
+
+    .mini-card-icon.bg-soft-success {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+    }
+
+    .mini-card-icon.bg-soft-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+
+    .mini-card-icon.bg-soft-info {
+        background-color: rgba(13, 202, 240, 0.1);
+        color: #0dcaf0;
+    }
+
+    .mini-card-icon.bg-soft-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+/* Texto truncado para nombres largos */
+.text-truncate-custom {
+    display: inline-block;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .gif-estado-container {
+        height: 90px;
+    }
+
+    .mini-card-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+}

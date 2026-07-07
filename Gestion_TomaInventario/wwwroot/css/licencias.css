@@ -1,0 +1,111 @@
+﻿body {
+    background-color: #f8f9fa;
+}
+
+.custom-table tbody tr {
+    transition: all 0.2s ease-in-out;
+}
+
+    .custom-table tbody tr:hover {
+        background-color: #f1f5f9 !important;
+        transform: scale(1.002);
+    }
+
+.card {
+    border-radius: 10px;
+}
+
+/* Estilos para la barra de búsqueda */
+.search-box {
+    position: relative;
+}
+
+    .search-box .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 1.1rem;
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    .search-box input {
+        padding-left: 45px;
+        padding-right: 45px;
+        border-radius: 50px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        height: 45px;
+    }
+
+        .search-box input:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.15);
+        }
+
+    .search-box .clear-search {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #dc3545;
+        cursor: pointer;
+        display: none;
+        z-index: 10;
+        font-size: 1.2rem;
+    }
+
+        .search-box .clear-search:hover {
+            color: #c82333;
+        }
+
+        .search-box .clear-search.visible {
+            display: block;
+        }
+
+.result-count {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem;
+}
+
+    .no-results i {
+        font-size: 3rem;
+        color: #dee2e6;
+    }
+
+/* Animación para resaltar */
+.highlight-match {
+    background-color: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* Fila oculta */
+.row-hidden {
+    display: none;
+}
+body {
+    background-color: #f8f9fa;
+}
+
+.custom-table tbody tr {
+    transition: all 0.2s ease-in-out;
+}
+
+    .custom-table tbody tr:hover {
+        background-color: #f1f5f9 !important;
+        transform: scale(1.002);
+    }
+
+.card {
+    border-radius: 10px;
+}

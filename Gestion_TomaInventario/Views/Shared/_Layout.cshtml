@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Gestion Toma Inventario</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Gestion_TomaInventario.styles.css" asp-append-version="true" />
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" asp-append-version="true" />
+</head>
+<body class="@(User.Identity?.IsAuthenticated == true ? "app-authenticated" : "app-guest")">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        var nombreUsuario = string.IsNullOrWhiteSpace(User.Identity.Name) ? "Usuario" : User.Identity.Name;
+        var inicialUsuario = nombreUsuario.Substring(0, 1).ToUpper();
+
+        <div class="app-shell" id="appShell">
+            <aside class="app-sidebar" aria-label="Menu principal">
+                <div class="sidebar-brand">
+                    <div class="brand-mark">GT</div>
+                    <div class="brand-copy">
+                        <span>Gestion</span>
+                        <strong>Inventario</strong>
+                    </div>
+                </div>
+
+                <button class="sidebar-toggle" type="button" id="sidebarToggle" aria-label="Contraer menu" aria-controls="appShell">
+                    <span class="toggle-icon"></span>
+                </button>
+                <nav class="sidebar-menu">
+                    <!-- Dropdown agrupado -->
+                    <div class="sidebar-dropdown">
+                        <button id="btnGestion"
+                                class="sidebar-link d-flex justify-content-between align-items-center w-100"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#menuGestion"
+                                aria-expanded="false"
+                                aria-controls="menuGestion">
+                            <span class="sidebar-icon">C</span>
+                            <span class="sidebar-text">Clientes</span>
+                            <i class="bi bi-caret-down-fill"></i>
+                        </button>
+
+                        <div class="collapse" id="menuGestion">
+                            <a class="sidebar-sublink" asp-controller="Home" asp-action="Index">
+                                <span class="sidebar-icon">PG</span>
+                                <span class="sidebar-text">Panel General</span>
+                            </a>
+
+                            <a class="sidebar-sublink" asp-controller="Empresa" asp-action="Licencias">
+                                <span class="sidebar-icon">L</span>
+                                <span class="sidebar-text">Licencias</span>
+                            </a>
+
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Enlace directo a Planes -->
+                <a class="sidebar-link d-flex align-items-center w-100"
+                   asp-controller="Planes" asp-action="Index">
+                    <span class="sidebar-icon">P</span>
+                    <span class="sidebar-text">Planes</span>
+                </a>
+
+
+
+                <div class="sidebar-user">
+                    <div class="user-avatar">@inicialUsuario</div>
+                    <div class="user-copy">
+                        <span>Sesion activa</span>
+                        <strong>@nombreUsuario</strong>
+                    </div>
+                </div>
+
+                <form asp-controller="Account" asp-action="Logout" method="post" class="sidebar-logout">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger w-100">
+                        <span class="sidebar-text">Cerrar sesion</span>
+                        <span class="logout-mini">S</span>
+                    </button>
+                </form>
+            </aside>
+
+            <main class="app-main" role="main">
+                @RenderBody()
+            </main>
+        </div>
+
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    }
+    else
+    {
+        <main role="main">
+            @RenderBody()
+        </main>
+    }
+    @await RenderSectionAsync("Styles", required: false)
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

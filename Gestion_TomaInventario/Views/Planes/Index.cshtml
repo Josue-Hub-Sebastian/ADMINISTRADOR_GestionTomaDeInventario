@@ -1,0 +1,168 @@
+﻿@using Gestion_TomaInventario.Models.ViewModels
+@model IEnumerable<PlanViewModel>
+
+@{
+    ViewData["Title"] = "Planes Vigentes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/IndexPlanes.css" asp-append-version="true" />
+}
+
+<div class="container-fluid py-4 planes-page">
+
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+        <div>
+            <h1 class="planes-title mb-2">PLANES VIGENTES EN EL SISTEMA</h1>
+            <p class="planes-subtitle mb-0">
+                Aquí se <a href="#" class="planes-link">listarán</a> los planes que yacen en el sistema (existen)
+            </p>
+        </div>
+
+        <div>
+            <a asp-action="Crear" asp-controller="Planes" class="btn btn-crear-plan">
+                Crear
+            </a>
+        </div>
+    </div>
+
+    <!-- Mensajes -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="custom-alert custom-alert-success mb-4">
+            <div class="custom-alert-content">
+                <strong>Éxito:</strong> @TempData["Success"]
+            </div>
+            <button type="button" class="custom-alert-close" onclick="cerrarAlerta(this)">×</button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="custom-alert custom-alert-error mb-4">
+            <div class="custom-alert-content">
+                <strong>Error:</strong> @TempData["Error"]
+            </div>
+            <button type="button" class="custom-alert-close" onclick="cerrarAlerta(this)">×</button>
+        </div>
+    }
+
+    <!-- Tabla -->
+    <div class="table-responsive tabla-planes-wrapper">
+        <table class="table tabla-planes align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Almacenes</th>
+                    <th>Ubicaciones</th>
+                    <th>SKU's</th>
+                    <th>Usuarios Admin</th>
+                    <th>Usuarios Operador</th>
+                    <th>Precio</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.NombrePlan</td>
+                            <td>@(item.Almacenes?.ToString() ?? "-")</td>
+                            <td>@(item.Ubicaciones?.ToString() ?? "-")</td>
+                            <td>@(item.ProductosSkus?.ToString() ?? "-")</td>
+                            <td>@(item.UsuariosWeb?.ToString() ?? "-")</td>
+                            <td>@(item.UsuariosAnd?.ToString() ?? "-")</td>
+                            <td>@($"${item.PrecioFijo:N2}")</td>
+                            <td>
+                                @if (item.Estado)
+                                {
+                                    <span class="estado-badge estado-activo">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="estado-badge estado-inactivo">Inactivo</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <div class="acciones-plan">
+                                    <a asp-action="Editar"
+                                       asp-route-id="@item.IdPlan"
+                                       class="btn btn-accion btn-editar"
+                                       title="Editar plan">
+                                        Editar
+                                    </a>
+
+                                    <form asp-action="CambiarEstado"
+                                          asp-controller="Planes"
+                                          method="post"
+                                          class="d-inline-block m-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.IdPlan" />
+
+                                        @if (item.Estado)
+                                        {
+                                            <input type="hidden" name="estado" value="false" />
+                                            <button type="submit"
+                                                    class="btn btn-accion btn-desactivar"
+                                                    title="Desactivar plan"
+                                                    onclick="return confirm('¿Está seguro de desactivar este plan?');">
+                                                Desactivar
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <input type="hidden" name="estado" value="true" />
+                                            <button type="submit"
+                                                    class="btn btn-accion btn-activar"
+                                                    title="Activar plan"
+                                                    onclick="return confirm('¿Está seguro de activar este plan?');">
+                                                Activar
+                                            </button>
+                                        }
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center py-4 sin-registros">
+                            No hay planes registrados en este momento.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function cerrarAlerta(button) {
+            const alert = button.closest('.custom-alert');
+            if (alert) {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-8px)';
+                setTimeout(() => {
+                    alert.remove();
+                }, 250);
+            }
+        }
+
+        // Cerrar alertas automáticamente después de 6 segundos
+        setTimeout(() => {
+            document.querySelectorAll('.custom-alert').forEach(alert => {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-8px)';
+                setTimeout(() => alert.remove(), 250);
+            });
+        }, 6000);
+    </script>
+}

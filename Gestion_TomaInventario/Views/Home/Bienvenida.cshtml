@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Panel General";
+}
+
+<div class="pg-wrapper">
+    <!-- Sección de Bienvenida -->
+    <div class="pg-bienvenida">
+        <h1>Bienvenido al Panel de Administración</h1>
+
+        <!-- Cards de Fecha, Hora y Clima -->
+        <div class="pg-datetime-grid">
+            <!-- Card Fecha -->
+            <div class="pg-card">
+                <span class="pg-card-icon">📅</span>
+                <div class="pg-card-value" id="pgFecha">--</div>
+                <div class="pg-card-label">Fecha</div>
+            </div>
+
+            <!-- Card Hora -->
+            <div class="pg-card">
+                <span class="pg-card-icon">🕐</span>
+                <div class="pg-card-value" id="pgHora">--</div>
+                <div class="pg-card-label">Hora</div>
+            </div>
+
+            <!-- Card Clima -->
+            <div class="pg-card pg-weather-card">
+                <span class="pg-weather-icon" id="pgWeatherIcon">--</span>
+                <div class="pg-weather-temp" id="pgWeatherTemp">--</div>
+                <div class="pg-weather-desc" id="pgWeatherDesc">--</div>
+                <div class="pg-card-label">Clima</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/bienvenida-admin.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/bienvenida-admin.js" asp-append-version="true"></script>
+}

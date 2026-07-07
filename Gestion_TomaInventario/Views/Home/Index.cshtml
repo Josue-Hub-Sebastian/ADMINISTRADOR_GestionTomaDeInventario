@@ -1,0 +1,170 @@
+﻿@using Gestion_TomaInventario.Models
+@using Gestion_TomaInventario.Models.ViewModels
+@model IReadOnlyList<EmpresaSincronizadaViewModel>
+
+@{
+    ViewData["Title"] = "Panel";
+    var totalEmpresas = Model?.Count ?? 0;
+    var empresasActivas = Model?.Count(x => x.Estado) ?? 0;
+    var empresasInactivas = totalEmpresas - empresasActivas;
+    var empresasConBase = Model?.Count(x => !string.IsNullOrWhiteSpace(x.NombreBD)) ?? 0;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
+}
+
+<!-- ============================================
+     HERO SECTION
+     ============================================ -->
+<section class="dashboard-hero mb-4">
+    <div class="row g-4 align-items-center">
+
+        <!-- Línea con título a la izquierda y botones a la derecha -->
+        <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+            <!-- Título a la izquierda -->
+            <h1 class="mb-0">Clientes sincronizados</h1>
+
+            <!-- Botones de filtro a la derecha -->
+            <div class="filter-btn-group d-flex">
+                <button class="filter-btn filter-btn-all active" onclick="filtrarEmpresas('todas')" id="btnTodas">
+                    <i class="bi bi-grid-fill btn-icon"></i>
+                    <span>Todas</span>
+                    <span class="filter-badge">@totalEmpresas</span>
+                </button>
+
+                <button class="filter-btn filter-btn-active" onclick="filtrarEmpresas('activas')" id="btnActivas">
+                    <i class="bi bi-check-circle-fill btn-icon"></i>
+                    <span>Activas</span>
+                    <span class="filter-badge">@empresasActivas</span>
+                </button>
+
+                <button class="filter-btn filter-btn-inactive" onclick="filtrarEmpresas('inactivas')" id="btnInactivas">
+                    <i class="bi bi-x-circle-fill btn-icon"></i>
+                    <span>Inactivas</span>
+                    <span class="filter-badge">@empresasInactivas</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Texto descriptivo debajo -->
+        <div class="col-12 col-lg-7">
+            <span class="hero-kicker">SP_SincronizarEmpresas</span>
+            <p class="mb-0">Panel de lectura para revisar empresas detectadas, instancias registradas y bases asociadas.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================
+     MENSAJE DE ERROR
+     ============================================ -->
+@if (ViewBag.ErrorSincronizacion is string mensajeError)
+{
+    <div class="alert alert-warning border-0 shadow-sm" role="alert">
+        <strong>⚠️ No se pudo sincronizar.</strong> @mensajeError
+    </div>
+}
+
+<!-- ============================================
+     SIN DATOS
+     ============================================ -->
+@if (Model == null || Model.Count == 0)
+{
+    <div class="card empty-state border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5 text-center">
+            <i class="bi bi-inbox display-3 text-muted"></i>
+            <h2 class="h4 mt-3">Sin datos para mostrar</h2>
+            <p class="text-secondary mb-0">Cuando la conexión y el procedimiento estén disponibles, las empresas aparecerán aquí automáticamente.</p>
+        </div>
+    </div>
+}
+else
+{
+   
+
+    <!-- ============================================
+         CARDS DE EMPRESAS
+         ============================================ -->
+    <div class="row g-4" id="empresasContainer">
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            var empresa = Model[i];
+            var accentClass = ObtenerAccent(i);
+
+            <div class="col-12 col-md-6 col-xl-4 empresa-card"
+                 data-estado="@(empresa.Estado ? "activa" : "inactiva")">
+
+                <a asp-controller="Empresa"
+                   asp-action="Dashboard"
+                   asp-route-idEmpresa="@empresa.IdEmpresa"
+                   class="text-decoration-none">
+
+                    <article class="client-card card h-100 border-0 shadow-sm @accentClass">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+                                <div class="client-title">
+                                    <span>Empresa</span>
+                                    <h2>@MostrarValor(empresa.Nombre)</h2>
+                                </div>
+                                <div class="d-flex flex-column align-items-end gap-2">
+                                    <span class="client-id">ID @empresa.IdEmpresa</span>
+                                    @if (empresa.Estado)
+                                    {
+                                        <span class="status-badge bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Activa
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge bg-danger bg-opacity-10 text-danger">
+                                            <i class="bi bi-x-circle-fill me-1"></i> Inactiva
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="client-data">
+                                <div>
+                                    <span>RUC</span>
+                                    <strong>@MostrarValor(empresa.Ruc)</strong>
+                                </div>
+                                <div>
+                                    <span>Base de datos</span>
+                                    @if (!string.IsNullOrWhiteSpace(empresa.NombreBD))
+                                    {
+                                        <strong class="text-success">
+                                            <i class="bi bi-database-check me-1"></i>@empresa.NombreBD
+                                        </strong>
+                                    }
+                                    else
+                                    {
+                                        <strong class="text-muted">No asignada</strong>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </a>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/index.js" asp-append-version="true"></script>
+}
+
+@functions {
+    private static string MostrarValor(string? valor)
+    {
+        return string.IsNullOrWhiteSpace(valor) ? "No registrado" : valor;
+    }
+
+    private static string ObtenerAccent(int index)
+    {
+        var accents = new[] { "accent-blue", "accent-green", "accent-amber", "accent-rose" };
+        return accents[index % accents.Length];
+    }
+}

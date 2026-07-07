@@ -1,0 +1,156 @@
+﻿@using Gestion_TomaInventario.Models.ViewModels
+@model PlanFormViewModel
+
+@{
+    ViewData["Title"] = "Crear Plan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/CrearPlan.css" asp-append-version="true" />
+}
+
+<div class="container-fluid crear-plan-page py-4">
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="crear-plan-title mb-2">CREAR NUEVO PLAN</h1>
+            <p class="crear-plan-subtitle mb-0">
+                Registra un nuevo plan con sus límites y precios.
+            </p>
+        </div>
+
+        <div>
+            <a asp-action="Index" asp-controller="Planes" class="btn btn-volver-plan">
+                Volver
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="custom-alert custom-alert-error mb-4">
+            <div class="custom-alert-content">
+                <strong>Error:</strong> @TempData["Error"]
+            </div>
+            <button type="button" class="custom-alert-close" onclick="cerrarAlerta(this)">×</button>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="custom-alert custom-alert-success mb-4">
+            <div class="custom-alert-content">
+                <strong>Éxito:</strong> @TempData["Success"]
+            </div>
+            <button type="button" class="custom-alert-close" onclick="cerrarAlerta(this)">×</button>
+        </div>
+    }
+
+    <div class="card crear-plan-card shadow-sm">
+        <div class="card-body p-4">
+            <form asp-action="Crear" asp-controller="Planes" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row g-4">
+
+                    <div class="col-md-6">
+                        <label asp-for="NombrePlan" class="form-label fw-semibold">Nombre del plan</label>
+                        <input asp-for="NombrePlan" class="form-control form-control-custom" />
+                        <span asp-validation-for="NombrePlan" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Almacenes" class="form-label fw-semibold">Almacenes</label>
+                        <input asp-for="Almacenes" class="form-control form-control-custom" type="number" min="0" />
+                        <span asp-validation-for="Almacenes" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Ubicaciones" class="form-label fw-semibold">Ubicaciones</label>
+                        <input asp-for="Ubicaciones" class="form-control form-control-custom" type="number" min="0" />
+                        <span asp-validation-for="Ubicaciones" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ProductosSkus" class="form-label fw-semibold">SKU's</label>
+                        <input asp-for="ProductosSkus" class="form-control form-control-custom" type="number" min="0" />
+                        <span asp-validation-for="ProductosSkus" class="text-danger"></span>
+                        <div class="form-text">Déjalo vacío si deseas manejarlo como ilimitado.</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="UsuariosWeb" class="form-label fw-semibold">Usuarios Admin / Web</label>
+                        <input asp-for="UsuariosWeb" class="form-control form-control-custom" type="number" min="0" />
+                        <span asp-validation-for="UsuariosWeb" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="UsuariosAnd" class="form-label fw-semibold">Usuarios Operador / App</label>
+                        <input asp-for="UsuariosAnd" class="form-control form-control-custom" type="number" min="0" />
+                        <span asp-validation-for="UsuariosAnd" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="InventariosPreparadosMax" class="form-label fw-semibold">Inventarios preparados máximos</label>
+                        <input asp-for="InventariosPreparadosMax" class="form-control form-control-custom" type="number" min="0" />
+                        <span asp-validation-for="InventariosPreparadosMax" class="text-danger"></span>
+                        <div class="form-text">Puedes dejarlo vacío si no aplica.</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="PrecioFijo" class="form-label fw-semibold">Precio fijo</label>
+                        <input asp-for="PrecioFijo" class="form-control form-control-custom" type="number" step="0.01" min="0" />
+                        <span asp-validation-for="PrecioFijo" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="PrecioLanzamiento" class="form-label fw-semibold">Precio lanzamiento</label>
+                        <input asp-for="PrecioLanzamiento" class="form-control form-control-custom" type="number" step="0.01" min="0" />
+                        <span asp-validation-for="PrecioLanzamiento" class="text-danger"></span>
+                        <div class="form-text">Opcional.</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Estado" class="form-label fw-semibold">Estado inicial</label>
+                        <select asp-for="Estado" class="form-select form-control-custom">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" asp-controller="Planes" class="btn btn-cancelar-plan">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-guardar-plan">
+                        Guardar plan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function cerrarAlerta(button) {
+            const alert = button.closest('.custom-alert');
+            if (alert) {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-8px)';
+                setTimeout(() => {
+                    alert.remove();
+                }, 250);
+            }
+        }
+    </script>
+}

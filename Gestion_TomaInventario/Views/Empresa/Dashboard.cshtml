@@ -1,0 +1,136 @@
+﻿@using Gestion_TomaInventario.Models.ViewModels
+@model DashboardEmpresaViewModel
+
+@{
+    ViewData["Title"] = "Dashboard de Control - " + Model.NombreEmpresa;
+}
+<!-- resto del archivo intacto -->
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Panel Central</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.NombreEmpresa</li>
+            </ol>
+        </nav>
+        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver a Clientes
+        </a>
+    </div>
+
+    @if (Model == null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> No se pudo cargar la información detallada de la empresa seleccionada.
+        </div>
+    }
+    else
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-start border-4 @(Model.EstadoLicencia ? "border-success" : "border-danger")">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <h4 class="card-title text-primary mb-1">@Model.NombreEmpresa</h4>
+                                <p class="text-muted small mb-0"><strong>RUC:</strong> @Model.Ruc</p>
+                            </div>
+                            <div class="col-md-4 border-start border-end">
+                                <p class="mb-1"><strong>Base de Datos:</strong> <code class="text-dark">@Model.NombreBD</code></p>
+                                <p class="text-muted small mb-0"><strong>Instalada el:</strong> @Model.FechaCreacionBD.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                                <span class="badge p-2 @(Model.EstadoLicencia ? "bg-success" : "bg-danger")">
+                                    <i class="bi @(Model.EstadoLicencia ? "bi-check-circle" : "bi-dash-circle") me-1"></i>
+                                    @(Model.EstadoLicencia ? "Licencia Activa" : "Licencia Inactiva / Suspendida")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0 text-secondary"><i class="bi bi-pie-chart-fill me-2"></i>Consumo Actual vs. Límites del Plan</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        @await Html.PartialAsync("_ProgressBarComponent", new {
+                        Titulo = "Productos en Catálogo",
+                                        Actual = Model.ProductosActual,
+                                        Max = Model.ProductosMax,
+                                        Porcentaje = Model.ProductosPorcentaje,
+                                        Color = Model.ProductosPorcentaje >= 90 ? "bg-danger" : (Model.ProductosPorcentaje >= 75 ? "bg-warning" : "bg-success")
+                                        })
+
+                    @await Html.PartialAsync("_ProgressBarComponent", new {
+                                        Titulo = "Almacenes Habilitados",
+                                        Actual = Model.AlmacenesActual,
+                                        Max = Model.AlmacenesMax,
+                                        Porcentaje = Model.AlmacenesPorcentaje,
+                                        Color = Model.AlmacenesPorcentaje >= 90 ? "bg-danger" : (Model.AlmacenesPorcentaje >= 75 ? "bg-warning" : "bg-success")
+                                        })
+
+                    @await Html.PartialAsync("_ProgressBarComponent", new {
+                                        Titulo = "Ubicaciones Físicas",
+                                        Actual = Model.UbicacionesActual,
+                                        Max = Model.UbicacionesMax,
+                                        Porcentaje = Model.UbicacionesPorcentaje,
+                                        Color = Model.UbicacionesPorcentaje >= 90 ? "bg-danger" : (Model.UbicacionesPorcentaje >= 75 ? "bg-warning" : "bg-success")
+                                        })
+
+                    @await Html.PartialAsync("_ProgressBarComponent", new {
+                                        Titulo = "Inventarios Preparados",
+                                        Actual = Model.InventariosPreparadosActual,
+                                        Max = Model.InventariosPreparadosMax,
+                                        Porcentaje = Model.InventariosPreparadosPorcentaje,
+                                        Color = Model.InventariosPreparadosPorcentaje >= 90 ? "bg-danger" : (Model.InventariosPreparadosPorcentaje >= 75 ? "bg-warning" : "bg-info")
+                                        })
+
+                    @await Html.PartialAsync("_ProgressBarComponent", new {
+                                        Titulo = "Usuarios Administradores",
+                                        Actual = Model.UsuariosAdminActual,
+                                        Max = Model.UsuariosAdminMax,
+                                        Porcentaje = Model.UsuariosAdminPorcentaje,
+                                        Color = Model.UsuariosAdminPorcentaje >= 90 ? "bg-danger" : "bg-secondary"
+                                        })
+
+                    @await Html.PartialAsync("_ProgressBarComponent", new {
+                                        Titulo = "Usuarios Operadores (App Móvil)",
+                                        Actual = Model.UsuariosOperadorActual,
+                                        Max = Model.UsuariosOperadorMax,
+                                        Porcentaje = Model.UsuariosOperadorPorcentaje,
+                                        Color = Model.UsuariosOperadorPorcentaje >= 90 ? "bg-danger" : "bg-secondary"
+                                        })
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-warning h-100">
+                <div class="card-header bg-warning bg-opacity-10 text-warning-emphasis">
+                    <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Datos de Contacto</h5>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-center text-center py-5">
+                    <div class="mb-3">
+                        <i class="bi bi-cone-striped text-warning fs-1"></i>
+                    </div>
+                    <h6 class="fw-bold">Módulo en Desarrollo</h6>
+                    <p class="text-muted small px-3">
+                        Esta sección se vinculará dinámicamente de forma nativa cuando se implemente e integre la tabla correspondiente en la Base de Datos.
+                    </p>
+                    <button class="btn btn-sm btn-outline-warning mx-auto disabled" disabled>
+                        <i class="bi bi-plus-circle me-1"></i> Asignar Contacto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+        }
+</div>

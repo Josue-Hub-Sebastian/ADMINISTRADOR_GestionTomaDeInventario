@@ -1,0 +1,401 @@
+﻿@using Gestion_TomaInventario.Models
+@using Gestion_TomaInventario.Models.ViewModels
+@model LicenciaViewModel
+@{
+    ViewData["Title"] = "Editar Licencia";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/editar-licencia.css" asp-append-version="true" />
+}
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 fade-in-up">
+        <div class="d-flex align-items-center gap-3">
+            <div class="gif-header-container shadow-sm">
+                <img src="~/images/notepad.gif"
+                     alt="Animación seguridad"
+                     style="width: 32px; height: 32px; object-fit: contain;"
+                     onerror="this.onerror=null; this.parentElement.innerHTML='<i class=&quot;bi bi-shield-lock-fill text-primary fs-3&quot;></i>'">
+            </div>
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a asp-action="Licencias" class="text-decoration-none">Panel Central</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Editar Licencia</li>
+                    </ol>
+                </nav>
+                <h2 class="h3 mb-0 text-gray-800">Editar Licencia de Cliente</h2>
+            </div>
+        </div>
+        <a asp-action="Licencias" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver al listado
+        </a>
+    </div>
+
+    <!-- ============================================
+         MINI CARDS INFORMATIVAS
+         ============================================ -->
+    <div class="row g-3 mb-4 fade-in-up">
+
+        <!-- Card: Empresa -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card mini-card shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="mini-card-icon bg-soft-primary">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div class="flex-grow-1" style="min-width: 0;">
+                        <small class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Empresa</small>
+                        <strong class="text-dark d-block text-truncate" style="font-size: 0.9rem;" title="@Model.Nombre">
+                            @Model.Nombre
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: RUC -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card mini-card shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="mini-card-icon bg-soft-success">
+                        <i class="bi bi-file-text"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">RUC / Identidad</small>
+                        <strong class="text-dark" style="font-size: 0.9rem;">@Model.Ruc</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Base de Datos -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card mini-card shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="mini-card-icon bg-soft-warning">
+                        <i class="bi bi-database"></i>
+                    </div>
+                    <div class="flex-grow-1" style="min-width: 0;">
+                        <small class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Base de Datos</small>
+                        <strong class="text-dark d-block text-truncate" style="font-size: 0.9rem;" title="@Model.NombreBD">
+                            @Model.NombreBD
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Estado Actual -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card mini-card shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="mini-card-icon @(Model.Estado ? "bg-soft-success" : "bg-soft-danger")">
+                        <i class="bi @(Model.Estado ? "bi-check-circle" : "bi-x-circle")"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Estado Actual</small>
+                        <span id="miniEstadoBadge" class="badge @(Model.Estado ? "bg-success" : "bg-danger")" style="font-size: 0.75rem;">
+                            @(Model.Estado ? "Activa" : "Inactiva")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         FORMULARIO PRINCIPAL
+         ============================================ -->
+    <form asp-action="Editar" method="post" class="needs-validation" id="formEditarLicencia">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="IdEmpresa" />
+
+        <div class="row g-4">
+
+            <!-- COLUMNA IZQUIERDA: Datos de Empresa y Estado -->
+            <div class="col-lg-4 fade-in-up">
+                <div class="card card-licencia shadow-sm border-0 h-100">
+                    <div class="card-header card-header-gradient secondary py-3">
+                        <h5 class="card-title mb-0"><i class="bi bi-building me-2"></i>Datos de la Empresa</h5>
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="mb-3">
+                                <label asp-for="Nombre" class="form-label fw-bold text-muted small">Nombre de Empresa</label>
+                                <input asp-for="Nombre" class="form-control bg-light" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Ruc" class="form-label fw-bold text-muted small">RUC</label>
+                                <input asp-for="Ruc" class="form-control bg-light" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="NombreBD" class="form-label fw-bold text-muted small">Base de Datos Asociada</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-database"></i></span>
+                                    <input asp-for="NombreBD" class="form-control bg-light" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <label asp-for="Estado" class="form-label fw-bold text-muted small d-block mb-2">Estado del Servicio</label>
+
+                            <div class="gif-estado-container mb-3" id="gifEstadoBox">
+                                <img id="gifEstadoImg"
+                                     src="@(Model.Estado ? "/images/habilitado_img.png" : "/images/deshabilitado_png.png")"
+                                     alt="Estado del servicio"
+                                     style="max-height: 80px; object-fit: contain;">
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div id="estadoBadge" class="estado-badge @(Model.Estado ? "activa" : "inactiva")">
+                                    <i class="bi @(Model.Estado ? "bi-check-circle-fill" : "bi-x-circle-fill")"></i>
+                                    <span id="estadoBadgeTexto">@(Model.Estado ? "Activa" : "Inactiva")</span>
+                                </div>
+                            </div>
+
+                            <select asp-for="Estado" class="form-select" id="selectEstado" onchange="actualizarEstiloEstado()">
+                                <option value="true" selected="@Model.Estado">Activa (Permite Operar)</option>
+                                <option value="false" selected="@(!Model.Estado)">Inactiva (Acceso Bloqueado)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: Límites y Restricciones -->
+           
+            <div class="col-lg-8 fade-in-up">
+                <div class="card card-licencia shadow-sm border-0 h-100">
+                    <div class="card-header card-header-gradient py-3">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-sliders me-2"></i>Límites y Restricciones del Plan
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <p class="text-muted small mb-4">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Establece los topes máximos permitidos para este clon. El sistema de negocio (BL) validará estas cantidades de manera síncrona.
+                        </p>
+
+                        <!-- =========================
+                             SELECCIÓN DE PLAN
+                        ========================== -->
+                        <div class="card border-0 bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3">
+                                    <i class="bi bi-box me-2"></i>
+                                    Selección de Plan
+                                </h6>
+
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-8">
+                                        <label asp-for="IdPlan" class="form-label fw-semibold">Plan de licencia</label>
+                                        <select asp-for="IdPlan" class="form-select" id="IdPlan">
+                                            <option value="">-- Seleccione un plan --</option>
+
+                                            @foreach (var plan in Model.ListaPlanes)
+                                            {
+                                                <option value="@plan.IdPlan"
+                                                        selected="@(Model.IdPlan == plan.IdPlan ? "selected" : null)"
+                                                        data-almacenes="@plan.Almacenes"
+                                                        data-ubicaciones="@plan.Ubicaciones"
+                                                        data-productos="@plan.ProductosSkus"
+                                                        data-admin="@plan.UsuariosWeb"
+                                                        data-operador="@plan.UsuariosAnd"
+                                                        data-inventarios="@plan.InventariosPreparadosMax">
+                                                    @plan.NombrePlan
+                                                </option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="IdPlan" class="text-danger"></span>
+                                        <div class="form-text">
+                                            Al seleccionar un plan, los límites se completarán automáticamente.
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-check form-switch mt-2">
+                                            <input asp-for="EsPersonalizado"
+                                                   class="form-check-input"
+                                                   type="checkbox"
+                                                   id="EsPersonalizado" />
+                                            <label class="form-check-label fw-semibold" for="EsPersonalizado">
+                                                Plan personalizado
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            Si activas esta opción, podrás editar manualmente los límites.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- =========================
+                             VIGENCIA DEL PLAN
+                        ========================== -->
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="InicioSuscripcion" class="form-label fw-semibold">
+                                    Inicio Suscripción
+                                </label>
+                                <input asp-for="InicioSuscripcion"
+                                       type="date"
+                                       class="form-control"
+                                       id="InicioSuscripcion"
+                                       min="@(Model.InicioSuscripcion.HasValue && Model.InicioSuscripcion.Value.Date < DateTime.Today
+                                               ? Model.InicioSuscripcion.Value.ToString("yyyy-MM-dd")
+                                               : DateTime.Today.ToString("yyyy-MM-dd"))"
+                                       required />
+                                <span asp-validation-for="InicioSuscripcion" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="MesesContratados" class="form-label fw-semibold">
+                                    Meses Contratados
+                                </label>
+                                <input asp-for="MesesContratados"
+                                       type="number"
+                                       class="form-control"
+                                       id="MesesContratados"
+                                       min="1"
+                                       placeholder="Ej. 12"
+                                       required />
+                                <span asp-validation-for="MesesContratados" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="FinSuscripcion" class="form-label fw-semibold">
+                                    Fin Suscripción
+                                </label>
+                                <input asp-for="FinSuscripcion"
+                                       type="date"
+                                       class="form-control bg-light"
+                                       id="FinSuscripcion"
+                                       readonly />
+                                <span asp-validation-for="FinSuscripcion" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- =========================
+                             LIMITES
+                        ========================== -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="ProductosMax" class="form-label fw-semibold">Máximo de Productos</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+                                    <input asp-for="ProductosMax"
+                                           type="number"
+                                           class="form-control campo-limite"
+                                           id="ProductosMax"
+                                           min="1"
+                                           placeholder="Ej. 5000"
+                                           required readonly/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="AlmacenesMax" class="form-label fw-semibold">Máximo de Almacenes</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                    <input asp-for="AlmacenesMax"
+                                           type="number"
+                                           class="form-control campo-limite"
+                                           id="AlmacenesMax"
+                                           min="1"
+                                           placeholder="Ej. 10"
+                                           required 
+                                           readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="UbicacionesMax" class="form-label fw-semibold">Máximo de Ubicaciones</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                                    <input asp-for="UbicacionesMax"
+                                           type="number"
+                                           class="form-control campo-limite"
+                                           id="UbicacionesMax"
+                                           min="1"
+                                           placeholder="Ej. 50"
+                                           required 
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="InventariosPreparadosMax" class="form-label fw-semibold">Inventarios por Periodo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar-check"></i></span>
+                                    <input asp-for="InventariosPreparadosMax"
+                                           type="number"
+                                           class="form-control campo-limite"
+                                           id="InventariosPreparadosMax"
+                                           min="1"
+                                           placeholder="Ej. 100"
+                                           required readonly />
+                                </div>
+                                <div class="form-text text-muted small">Límite mensual del plan de suscripción.</div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="UsuariosAdminMax" class="form-label fw-semibold">Usuarios Administradores</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person-workspace"></i></span>
+                                    <input asp-for="UsuariosAdminMax"
+                                           type="number"
+                                           class="form-control campo-limite"
+                                           id="UsuariosAdminMax"
+                                           min="1"
+                                           required readonly />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="UsuariosOperadorMax" class="form-label fw-semibold">Usuarios Operadores</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person-gear"></i></span>
+                                    <input asp-for="UsuariosOperadorMax"
+                                           type="number"
+                                           class="form-control campo-limite"
+                                           id="UsuariosOperadorMax"
+                                           min="1"
+                                           required readonly/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 text-end py-3">
+                        <hr class="mt-0 mb-3">
+                        <a asp-action="Licencias" class="btn btn-light px-4 me-2">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4 btn-guardar">
+                            <i class="bi bi-save me-1"></i> Guardar Configuración
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </form>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/editar-licencia.js" asp-append-version="true"></script>
+
+
+}

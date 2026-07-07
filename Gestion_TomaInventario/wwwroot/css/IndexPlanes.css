@@ -1,0 +1,342 @@
+﻿/* =========================
+   PÁGINA PLANES
+========================= */
+.planes-page {
+    background: linear-gradient(180deg, #d9f0f3 0%, #d8edf3 100%);
+    min-height: calc(100vh - 70px);
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+/* =========================
+   ENCABEZADO
+========================= */
+.planes-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 2.15rem;
+    font-weight: 700;
+    color: #111;
+    text-transform: uppercase;
+    line-height: 1.15;
+    margin: 0;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.35);
+}
+
+.planes-subtitle {
+    font-size: 0.95rem;
+    color: #1f1f1f;
+    margin-top: 6px;
+}
+
+.planes-link {
+    color: #0d6efd;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+    .planes-link:hover {
+        color: #0a58ca;
+    }
+
+/* =========================
+   BOTÓN CREAR
+========================= */
+.btn-crear-plan {
+    background: linear-gradient(180deg, #f7bf34 0%, #edae16 100%);
+    border: 2px solid #8f6200;
+    color: #fff;
+    min-width: 120px;
+    padding: 10px 26px;
+    font-weight: 700;
+    border-radius: 0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+    transition: all .2s ease-in-out;
+}
+
+    .btn-crear-plan:hover {
+        background: linear-gradient(180deg, #efb31e 0%, #dd9d0f 100%);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .btn-crear-plan:focus {
+        box-shadow: 0 0 0 0.2rem rgba(248, 181, 28, 0.25);
+    }
+
+/* =========================
+   ALERTAS PERSONALIZADAS
+========================= */
+.custom-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
+    animation: fadeSlideDown 0.25s ease;
+}
+
+.custom-alert-content {
+    font-size: 0.95rem;
+    color: #1f2937;
+    line-height: 1.45;
+}
+
+    .custom-alert-content strong {
+        margin-right: 4px;
+    }
+
+.custom-alert-close {
+    border: none;
+    background: transparent;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+    color: inherit;
+    opacity: .75;
+    transition: opacity .2s ease, transform .2s ease;
+}
+
+    .custom-alert-close:hover {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+
+.custom-alert-success {
+    background: #ecfdf3;
+    border-color: #b7ebc8;
+    color: #166534;
+}
+
+    .custom-alert-success .custom-alert-content {
+        color: #166534;
+    }
+
+.custom-alert-error {
+    background: #fef2f2;
+    border-color: #f5b7b7;
+    color: #991b1b;
+}
+
+    .custom-alert-error .custom-alert-content {
+        color: #991b1b;
+    }
+
+@keyframes fadeSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   CONTENEDOR TABLA
+========================= */
+.tabla-planes-wrapper {
+    margin-top: 30px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    overflow-x: auto;
+    background: rgba(255,255,255,0.15);
+}
+
+/* =========================
+   TABLA
+========================= */
+.tabla-planes {
+    min-width: 1100px;
+    margin-bottom: 0;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.18);
+}
+
+    .tabla-planes thead th {
+        background: #3f6fbe;
+        color: #fff;
+        font-size: 0.88rem;
+        font-weight: 700;
+        text-align: left;
+        border: 1px solid rgba(255,255,255,0.35);
+        padding: 12px 10px;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .tabla-planes tbody td {
+        height: 52px;
+        border: 1px solid rgba(255,255,255,0.55);
+        padding: 10px;
+        vertical-align: middle;
+        background-color: rgba(255,255,255,0.25);
+        color: #1f2937;
+        font-size: 0.95rem;
+    }
+
+    .tabla-planes tbody tr:nth-child(even) td {
+        background-color: rgba(179, 189, 219, 0.28);
+    }
+
+    .tabla-planes tbody tr:hover td {
+        background-color: rgba(255,255,255,0.48);
+        transition: background-color .2s ease;
+    }
+
+/* =========================
+   ESTADO
+========================= */
+.estado-badge {
+    display: inline-block;
+    min-width: 88px;
+    text-align: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.estado-activo {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #8de0bc;
+}
+
+.estado-inactivo {
+    background: #e5e7eb;
+    color: #374151;
+    border: 1px solid #cfd4dc;
+}
+
+/* =========================
+   ACCIONES
+========================= */
+.acciones-plan {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-accion {
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: all .2s ease-in-out;
+    cursor: pointer;
+    min-width: 96px;
+    text-align: center;
+}
+
+/* Editar */
+.btn-editar {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-color: #9ec5fe;
+}
+
+    .btn-editar:hover {
+        background: #bfdbfe;
+        color: #1e40af;
+    }
+
+/* Activar */
+.btn-activar {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #86efac;
+}
+
+    .btn-activar:hover {
+        background: #bbf7d0;
+        color: #14532d;
+    }
+
+/* Desactivar */
+.btn-desactivar {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+}
+
+    .btn-desactivar:hover {
+        background: #fecaca;
+        color: #991b1b;
+    }
+
+/* =========================
+   SIN REGISTROS
+========================= */
+.sin-registros {
+    font-size: 1rem;
+    color: #4b5563;
+    background-color: rgba(255,255,255,0.35) !important;
+    font-weight: 600;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 992px) {
+    .planes-title {
+        font-size: 1.8rem;
+    }
+
+    .btn-crear-plan {
+        min-width: 105px;
+        padding: 9px 18px;
+    }
+
+    .tabla-planes {
+        min-width: 980px;
+    }
+}
+
+@media (max-width: 768px) {
+    .planes-page {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .planes-title {
+        font-size: 1.55rem;
+    }
+
+    .planes-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .custom-alert {
+        padding: 12px 14px;
+    }
+
+    .custom-alert-content {
+        font-size: 0.9rem;
+    }
+
+    .btn-accion {
+        min-width: 88px;
+        padding: 7px 12px;
+        font-size: 0.82rem;
+    }
+
+    .estado-badge {
+        min-width: 80px;
+        padding: 5px 12px;
+        font-size: 0.8rem;
+    }
+}

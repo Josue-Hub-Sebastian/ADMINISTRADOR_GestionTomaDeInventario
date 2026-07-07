@@ -1,0 +1,188 @@
+﻿/* =============================================
+   PANEL GENERAL - Dashboard Principal
+   Diseño limpio y profesional ✨
+   ============================================= */
+
+/* Contenedor principal */
+.pg-wrapper {
+    min-height: calc(100vh - 60px);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+    /* Efecto de fondo sutil */
+    .pg-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+/* Contenedor de la bienvenida */
+.pg-bienvenida {
+    position: relative;
+    z-index: 2;
+    padding: 40px;
+    text-align: center;
+}
+
+    /* Título principal */
+    .pg-bienvenida h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0 0 30px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Grid de cards de fecha y hora */
+.pg-datetime-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+/* Cards individuales */
+.pg-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 30px 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+    .pg-card:hover {
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+/* Icono de la card */
+.pg-card-icon {
+    font-size: 32px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* Valor de la card (fecha/hora) */
+.pg-card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    transition: none; /* Evitar transiciones que causen parpadeo */
+}
+
+/* Etiqueta de la card */
+.pg-card-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+}
+
+/* Card del clima */
+.pg-weather-card {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.pg-weather-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    display: block;
+    animation: weatherPulse 3s ease-in-out infinite;
+}
+
+@keyframes weatherPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.pg-weather-temp {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.pg-weather-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.9);
+    text-transform: capitalize;
+}
+
+/* Animación sutil de actualización */
+@keyframes subtleUpdate {
+    0% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.8;
+    }
+}
+
+.pg-updating {
+    animation: subtleUpdate 0.5s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pg-bienvenida {
+        padding: 30px 20px;
+    }
+
+        .pg-bienvenida h1 {
+            font-size: 24px;
+        }
+
+    .pg-datetime-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .pg-card {
+        padding: 20px;
+    }
+
+    .pg-card-value {
+        font-size: 24px;
+    }
+}
