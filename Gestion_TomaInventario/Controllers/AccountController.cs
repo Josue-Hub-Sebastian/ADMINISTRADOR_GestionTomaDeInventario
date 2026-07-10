@@ -51,6 +51,7 @@ namespace Gestion_TomaInventario.Controllers
                     ModelState.AddModelError(string.Empty, "Usuario o contrasena incorrectos.");
                     return View(model);
                 }
+                //ras tas tas
                 
 
                 var claims = new List<Claim>

@@ -40,7 +40,7 @@ namespace Gestion_TomaInventario.Controllers
             }
         }
 
-        // Ahora esta vista es la primera que ves al entrar al login p mi ñaño 
+        // Ahora esta vista es la primera que ves al entrar al login p mi ñaño xd
         [Authorize]
         public IActionResult Bienvenida()
         {
