@@ -49,4 +49,27 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+           //chapa lo que metas 
+            const usuario = document.getElementById('Usuario');
+            const contrasena = document.getElementById('Contrasena');
+            const btn = document.getElementById('loginButton');
+
+            //  para validar que coloque algo los campos para hacer la comprobacion 
+            function updateButton() {
+                const u = usuario?.value?.trim().length > 0;
+                const p = contrasena?.value?.trim().length > 0;
+                if (btn) btn.disabled = !(u && p);
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // estado inicial
+                updateButton();
+                // escuchar cambios
+                usuario?.addEventListener('input', updateButton);
+                contrasena?.addEventListener('input', updateButton);
+            });
+        })();
+    </script>
 }

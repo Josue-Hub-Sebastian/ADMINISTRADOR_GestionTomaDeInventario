@@ -44,12 +44,14 @@ namespace Gestion_TomaInventario.Controllers
             try
             {
                 var usuario = await _usuarioService.ValidarLoginAsync(model.Usuario.Trim(), model.Contrasena);
+                var contrasenaValida = await _usuarioService.ValidarLoginAsync(model.Usuario.Trim(), model.Contrasena);
 
-                if (usuario is null)
+                if (usuario is null ||contrasenaValida is null)
                 {
                     ModelState.AddModelError(string.Empty, "Usuario o contrasena incorrectos.");
                     return View(model);
                 }
+                
 
                 var claims = new List<Claim>
                 {

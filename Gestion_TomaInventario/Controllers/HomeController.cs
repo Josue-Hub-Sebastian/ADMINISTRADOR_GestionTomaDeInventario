@@ -40,7 +40,7 @@ namespace Gestion_TomaInventario.Controllers
             }
         }
 
-        // Nueva acción: muestra Views/Home/Bienvenida.cshtml
+        // Ahora esta vista es la primera que ves al entrar al login p mi ñaño 
         [Authorize]
         public IActionResult Bienvenida()
         {
