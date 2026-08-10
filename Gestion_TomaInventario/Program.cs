@@ -5,10 +5,14 @@ using Gestion_TomaInventario.Services.UsuarioServ;
 using Gestion_TomaInventario.Repository.PlanRepo;
 using Gestion_TomaInventario.Services.PlanServ;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Gestion_TomaInventario.Repository.BackUpRepo;
+using Gestion_TomaInventario.Services.BackupServ;
+using Gestion_TomaInventario.Services.BackUpManager;
+using Gestion_TomaInventario.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ya sabes :v
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
@@ -16,6 +20,10 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IEmpresaService, EmpresaService>();
 builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 builder.Services.AddScoped<IPlanService, PlanService>();
+builder.Services.AddScoped<IBackupRepository,BackupRepository>();
+builder.Services.AddScoped<IBackupService,BackupService>();
+builder.Services.AddScoped<IBackupManager,BackupManager>();
+builder.Services.AddHostedService<BackupHostedService>();// aqui la logica de la hora dia mes para calular el backup :v
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

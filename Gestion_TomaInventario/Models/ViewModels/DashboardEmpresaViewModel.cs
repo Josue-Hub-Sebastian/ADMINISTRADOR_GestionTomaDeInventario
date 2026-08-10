@@ -69,6 +69,9 @@
 
         public decimal InventariosPreparadosPorcentaje => InventariosPreparadosMax == 0 ? 0 : InventariosPreparadosActual * 100M / InventariosPreparadosMax;
     
+
+
+        public ContactoEmpresaViewModel? Contacto {  get; set; }
     
         
     

@@ -2,7 +2,7 @@
 @model DashboardEmpresaViewModel
 
 @{
-    ViewData["Title"] = "Dashboard de Control - " + Model.NombreEmpresa;
+    ViewData["Title"] = "Dashboard de Control - " + (Model?.NombreEmpresa ?? "Empresa no encontrada");
 }
 <!-- resto del archivo intacto -->
 
@@ -11,7 +11,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Panel Central</a></li>
-                <li class="breadcrumb-item active" aria-current="page">@Model.NombreEmpresa</li>
+                <li class="breadcrumb-item active" aria-current="page">@(Model?.NombreEmpresa ?? "—")</li>
             </ol>
         </nav>
         <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-sm">
@@ -113,24 +113,274 @@
         </div>
 
         <div class="col-lg-4 mb-4">
+
             <div class="card shadow-sm border-warning h-100">
-                <div class="card-header bg-warning bg-opacity-10 text-warning-emphasis">
-                    <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Datos de Contacto</h5>
-                </div>
-                <div class="card-body d-flex flex-column justify-content-center text-center py-5">
-                    <div class="mb-3">
-                        <i class="bi bi-cone-striped text-warning fs-1"></i>
+
+                <div class="card-header bg-warning bg-opacity-10">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-lines-fill me-2"></i>
+                            Datos de Contacto
+                        </h5>
+
+                        @if (Model.Contacto != null)
+                        {
+                            <button type="button"
+                                    id="btnEditarContacto"
+                                    class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        }
+
                     </div>
-                    <h6 class="fw-bold">Módulo en Desarrollo</h6>
-                    <p class="text-muted small px-3">
-                        Esta sección se vinculará dinámicamente de forma nativa cuando se implemente e integre la tabla correspondiente en la Base de Datos.
-                    </p>
-                    <button class="btn btn-sm btn-outline-warning mx-auto disabled" disabled>
-                        <i class="bi bi-plus-circle me-1"></i> Asignar Contacto
-                    </button>
+
+                </div>
+
+                <div class="card-body">
+
+                    @if (Model.Contacto == null)
+                    {
+                        <div id="panelSinContacto" class="text-center py-5">
+
+                            <i class="bi bi-person-x text-warning display-3"></i>
+
+                            <h5 class="fw-bold mt-3">
+                                No existe un contacto registrado
+                            </h5>
+
+                            <p class="text-muted">
+
+                                Registra el contacto principal de esta empresa para soporte,
+                                renovaciones y comunicaciones importantes.
+
+                            </p>
+
+                            <button class="btn btn-warning"
+                                    id="btnNuevoContacto">
+
+                                <i class="bi bi-plus-circle"></i>
+
+                                Registrar Contacto
+
+                            </button>
+
+                        </div>
+
+                        <div id="panelFormulario" class="d-none">
+
+                            <form id="frmContacto" novalidate>
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="IdEmpresa"
+                                       value="@Model.IdEmpresa" />
+
+                                <div class="mb-3">
+
+                                    <label class="form-label fw-semibold">
+
+                                        Empresa
+
+                                    </label>
+
+                                    <input class="form-control"
+                                           readonly
+                                           value="@Model.NombreEmpresa" />
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label class="form-label">
+
+                                        Contacto
+
+                                    </label>
+
+                                    <input name="NombreContacto"
+                                           required
+                                           maxlength="150"
+                                           class="form-control contacto-input" />
+                                    <div class="invalid-feedback">Ingresa el nombre del contacto.</div>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label class="form-label">
+
+                                        Teléfono
+
+                                    </label>
+
+                                    <input name="TelefonoContacto"
+                                           type="tel"
+                                           required
+                                           pattern="[0-9+ ]{6,15}"
+                                           class="form-control contacto-input" />
+                                    <div class="invalid-feedback">Ingresa un teléfono válido (6 a 15 dígitos).</div>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label class="form-label">
+
+                                        Correo
+
+                                    </label>
+
+                                    <input name="CorreoContacto"
+                                           type="email"
+                                           required
+                                           class="form-control contacto-input" />
+                                    <div class="invalid-feedback">Ingresa un correo válido.</div>
+
+                                </div>
+
+                                <div id="accionesContacto">
+
+                                    <div class="d-grid gap-2">
+
+                                        <button type="submit" class="btn btn-success">
+
+                                            <i class="bi bi-check-circle"></i>
+
+                                            Guardar
+
+                                        </button>
+
+                                        <button type="button"
+                                                id="btnCancelarContacto"
+                                                class="btn btn-outline-secondary">
+
+                                            Cancelar
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="panelFormulario">
+
+                            <form id="frmContacto" novalidate>
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="IdEmpresa"
+                                       value="@Model.IdEmpresa" />
+
+                                <div class="mb-3">
+
+                                    <label class="form-label fw-semibold">
+
+                                        Empresa
+
+                                    </label>
+
+                                    <input class="form-control"
+                                           readonly
+                                           value="@Model.NombreEmpresa" />
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label class="form-label">
+
+                                        Contacto
+
+                                    </label>
+
+                                    <input name="NombreContacto"
+                                           required
+                                           maxlength="150"
+                                           class="form-control contacto-input"
+                                           value="@Model.Contacto.NombreContacto" />
+                                    <div class="invalid-feedback">Ingresa el nombre del contacto.</div>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label class="form-label">
+
+                                        Teléfono
+
+                                    </label>
+
+                                    <input name="TelefonoContacto"
+                                           type="tel"
+                                           required
+                                           pattern="[0-9+ ]{6,15}"
+                                           class="form-control contacto-input"
+                                           value="@Model.Contacto.TelefonoContacto" />
+                                    <div class="invalid-feedback">Ingresa un teléfono válido (6 a 15 dígitos).</div>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label class="form-label">
+
+                                        Correo
+
+                                    </label>
+
+                                    <input name="CorreoContacto"
+                                           type="email"
+                                           required
+                                           class="form-control contacto-input"
+                                           value="@Model.Contacto.CorreoContacto" />
+                                    <div class="invalid-feedback">Ingresa un correo válido.</div>
+
+                                </div>
+
+                                <div id="accionesContacto" class="d-none">
+
+                                    <div class="d-grid gap-2">
+
+                                        <button type="submit" class="btn btn-success">
+
+                                            <i class="bi bi-check-circle"></i>
+
+                                            Guardar
+
+                                        </button>
+
+                                        <button type="button"
+                                                id="btnCancelarContacto"
+                                                class="btn btn-outline-secondary">
+
+                                            Cancelar
+
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
+
     </div>
         }
 </div>
+
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/dash.js" asp-append-version="true"></script>
+}

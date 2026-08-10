@@ -15,5 +15,9 @@ namespace Gestion_TomaInventario.Services.EmpresaServ
 
         //canelita  
         Task<IReadOnlyList<PlanDropdownViewModel>> ListarPlanesActivosAsync();
+
+        Task<ContactoEmpresaViewModel?> ObtenerContactoEmpresaAsync(int idEmpresa);
+
+        Task<bool> GuardarContactoEmpresaAsync(ContactoEmpresaViewModel model);
     }
 }

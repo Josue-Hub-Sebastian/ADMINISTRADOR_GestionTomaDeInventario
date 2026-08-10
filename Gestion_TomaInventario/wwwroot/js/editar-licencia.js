@@ -112,7 +112,151 @@ function configurarEnvioFormulario() {
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener("DOMContentLoaded", function () {
-    actualizarEstiloEstado();
+    const ddlPlan = document.getElementById("IdPlan");
+    const chkPersonalizado = document.getElementById("EsPersonalizado");
+
+    const txtProductos = document.getElementById("ProductosMax");
+    const txtAlmacenes = document.getElementById("AlmacenesMax");
+    const txtUbicaciones = document.getElementById("UbicacionesMax");
+    const txtInventarios = document.getElementById("InventariosPreparadosMax");
+    const txtUsuariosAdmin = document.getElementById("UsuariosAdminMax");
+    const txtUsuariosOperador = document.getElementById("UsuariosOperadorMax");
+
+    const txtInicio = document.getElementById("InicioSuscripcion");
+    const txtMeses = document.getElementById("MesesContratados");
+    const txtFin = document.getElementById("FinSuscripcion");
+
+    const camposLimite = [
+        txtProductos,
+        txtAlmacenes,
+        txtUbicaciones,
+        txtInventarios,
+        txtUsuariosAdmin,
+        txtUsuariosOperador
+    ];
+
+    function calcularFinSuscripcion() {
+
+        if (!txtInicio || !txtMeses || !txtFin)
+            return;
+
+        const inicio = txtInicio.value;
+        const meses = parseInt(txtMeses.value);
+
+        if (!inicio || isNaN(meses) || meses <= 0) {
+            txtFin.value = "";
+            return;
+        }
+
+        const fecha = new Date(inicio + "T00:00:00");
+        fecha.setMonth(fecha.getMonth() + meses);
+
+        const yyyy = fecha.getFullYear();
+        const mm = String(fecha.getMonth() + 1).padStart(2, "0");
+        const dd = String(fecha.getDate()).padStart(2, "0");
+
+        txtFin.value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    function setCamposReadonly(readonly) {
+
+        camposLimite.forEach(campo => {
+
+            if (!campo)
+                return;
+
+            campo.readOnly = readonly;
+            campo.classList.toggle("bg-light", readonly);
+        });
+
+    }
+    function limpiarCamposLimite() {
+
+        camposLimite.forEach(campo => {
+
+            if (campo)
+                campo.value = "";
+
+        });
+
+    }
+
+    function cargarPlanSeleccionado() {
+
+        if (!ddlPlan)
+            return;
+
+        const opcion = ddlPlan.options[ddlPlan.selectedIndex];
+
+        if (!opcion || !opcion.value) {
+            limpiarCamposLimite();
+            return;
+        }
+
+        txtAlmacenes.value = opcion.dataset.almacenes || "";
+        txtUbicaciones.value = opcion.dataset.ubicaciones || "";
+        txtProductos.value = opcion.dataset.productos || "";
+        txtUsuariosAdmin.value = opcion.dataset.admin || "";
+        txtUsuariosOperador.value = opcion.dataset.operador || "";
+        txtInventarios.value = opcion.dataset.inventarios || "";
+
+    }
+
+    function aplicarModoEdicion() {
+
+        const personalizado = chkPersonalizado.checked;
+
+        if (personalizado) {
+
+            // NO BORRAR EL PLAN
+            ddlPlan.disabled = true;
+            // Permitir editar limites
+            setCamposReadonly(false);
+
+        }
+        else {
+            ddlPlan.disabled = false;
+
+            if (ddlPlan.value) {
+                cargarPlanSeleccionado();
+                setCamposReadonly(true);
+            }
+            else {
+                limpiarCamposLimite();
+                setCamposReadonly(false);
+            }
+        }
+    }
+
+    
+    if (ddlPlan) {
+
+        ddlPlan.addEventListener("change", function () {
+            if (chkPersonalizado.checked)
+                return;
+
+            cargarPlanSeleccionado();
+
+            if (ddlPlan.value)
+                setCamposReadonly(true);
+            else
+                setCamposReadonly(false);
+        });
+    }
+
+    if (chkPersonalizado) {
+        chkPersonalizado.addEventListener("change", aplicarModoEdicion);
+    }
+
+    if (txtInicio)
+        txtInicio.addEventListener("change", calcularFinSuscripcion);
+
+    if (txtMeses)
+        txtMeses.addEventListener("input", calcularFinSuscripcion);
+
+    
+    aplicarModoEdicion();
+    calcularFinSuscripcion();
     configurarEnvioFormulario();
 });
 
@@ -120,202 +264,73 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-document.addEventListener("DOMContentLoaded", function () {
+//document.addEventListener("DOMContentLoaded", function () {
 
-    const inicio = document.getElementById("InicioSuscripcion");
-    const meses = document.getElementById("MesesContratados");
-    const fin = document.getElementById("FinSuscripcion");
+//    const inicio = document.getElementById("InicioSuscripcion");
+//    const meses = document.getElementById("MesesContratados");
+//    const fin = document.getElementById("FinSuscripcion");
 
-    function calcularFechaFin() {
+//    function calcularFechaFin() {
 
-        if (!inicio.value || !meses.value) {
-            fin.value = "";
-            return;
-        }
+//        if (!inicio.value || !meses.value) {
+//            fin.value = "";
+//            return;
+//        }
 
-        const partes = inicio.value.split("-");
+//        const partes = inicio.value.split("-");
 
-        let fecha = new Date(
-            parseInt(partes[0]),       // año
-            parseInt(partes[1]) - 1,   // mes (0-11)
-            parseInt(partes[2])        // día
-        );
+//        let fecha = new Date(
+//            parseInt(partes[0]),       // año
+//            parseInt(partes[1]) - 1,   // mes (0-11)
+//            parseInt(partes[2])        // día
+//        );
 
-        fecha.setMonth(fecha.getMonth() + parseInt(meses.value));
+//        fecha.setMonth(fecha.getMonth() + parseInt(meses.value));
 
-        const año = fecha.getFullYear();
-        const mes = String(fecha.getMonth() + 1).padStart(2, "0");
-        const dia = String(fecha.getDate()).padStart(2, "0");
+//        const año = fecha.getFullYear();
+//        const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+//        const dia = String(fecha.getDate()).padStart(2, "0");
 
-        fin.value = `${año}-${mes}-${dia}`;
-    }
+//        fin.value = `${año}-${mes}-${dia}`;
+//    }
 
-    inicio.addEventListener("change", calcularFechaFin);
-    meses.addEventListener("input", calcularFechaFin);
+//    inicio.addEventListener("change", calcularFechaFin);
+//    meses.addEventListener("input", calcularFechaFin);
 
-    calcularFechaFin();
-});
-
-
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const ddlPlan = document.getElementById("IdPlan");
-            const chkPersonalizado = document.getElementById("EsPersonalizado");
-
-            const txtProductos = document.getElementById("ProductosMax");
-            const txtAlmacenes = document.getElementById("AlmacenesMax");
-            const txtUbicaciones = document.getElementById("UbicacionesMax");
-            const txtInventarios = document.getElementById("InventariosPreparadosMax");
-            const txtUsuariosAdmin = document.getElementById("UsuariosAdminMax");
-            const txtUsuariosOperador = document.getElementById("UsuariosOperadorMax");
-
-            const txtInicio = document.getElementById("InicioSuscripcion");
-            const txtMeses = document.getElementById("MesesContratados");
-            const txtFin = document.getElementById("FinSuscripcion");
-
-            const camposLimite = [
-                txtProductos,
-                txtAlmacenes,
-                txtUbicaciones,
-                txtInventarios,
-                txtUsuariosAdmin,
-                txtUsuariosOperador
-            ];
-
-            //function calcularFinSuscripcion() {
-            //    const fechaInicio = txtInicio?.value;
-            //    const meses = parseInt(txtMeses?.value || "0");
-
-            //    if (!fechaInicio || !meses || meses <= 0) {
-            //        if (txtFin) txtFin.value = "";
-            //        return;
-            //    }
-
-            //    const fecha = new Date(fechaInicio + "T00:00:00");
-            //    fecha.setMonth(fecha.getMonth() + meses);
-
-            //    const yyyy = fecha.getFullYear();
-            //    const mm = String(fecha.getMonth() + 1).padStart(2, '0');
-            //    const dd = String(fecha.getDate()).padStart(2, '0');
-
-            //    txtFin.value = `${ yyyy } -${ mm } -${ dd } `;
-            //}
-
-            function setCamposReadonly(readonly) {
-                camposLimite.forEach(campo => {
-                    if (!campo) return;
-                    campo.readOnly = readonly;
-
-                    if (readonly) {
-                        campo.classList.add("bg-light");
-                    } else {
-                        campo.classList.remove("bg-light");
-                    }
-                });
-            }
-
-            function limpiarCamposLimite() {
-                txtProductos.value = "";
-                txtAlmacenes.value = "";
-                txtUbicaciones.value = "";
-                txtInventarios.value = "";
-                txtUsuariosAdmin.value = "";
-                txtUsuariosOperador.value = "";
-            }
-
-            function cargarPlanSeleccionado() {
-                if (!ddlPlan) return;
-
-                const opcion = ddlPlan.options[ddlPlan.selectedIndex];
-                if (!opcion || !opcion.value) {
-                    if (!chkPersonalizado.checked) {
-                        limpiarCamposLimite();
-                    }
-                    return;
-                }
-
-                txtAlmacenes.value = opcion.dataset.almacenes || "";
-                txtUbicaciones.value = opcion.dataset.ubicaciones || "";
-                txtProductos.value = opcion.dataset.productos || "";
-                txtUsuariosAdmin.value = opcion.dataset.admin || "";
-                txtUsuariosOperador.value = opcion.dataset.operador || "";
-                txtInventarios.value = opcion.dataset.inventarios || "";
-            }
-
-            function aplicarModoEdicion() {
-                const esPersonalizado = chkPersonalizado.checked;
-
-                if (esPersonalizado) {
-                    ddlPlan.value = "";
-                    ddlPlan.disabled = true;
-                    setCamposReadonly(false);
-                } else {
-                    ddlPlan.disabled = false;
-                    cargarPlanSeleccionado();
-
-                    if (ddlPlan.value) {
-                        setCamposReadonly(true);
-                    } else {
-                        setCamposReadonly(false);
-                    }
-                }
-            }
-
-            if (ddlPlan) {
-                ddlPlan.addEventListener("change", function () {
-                    if (chkPersonalizado.checked) return;
-
-                    cargarPlanSeleccionado();
-
-                    if (ddlPlan.value) {
-                        setCamposReadonly(true);
-                    } else {
-                        setCamposReadonly(false);
-                    }
-                });
-            }
-
-            if (chkPersonalizado) {
-                chkPersonalizado.addEventListener("change", aplicarModoEdicion);
-            }
-
-            if (txtInicio) txtInicio.addEventListener("change", calcularFinSuscripcion);
-            if (txtMeses) txtMeses.addEventListener("input", calcularFinSuscripcion);
-
-            // Estado inicial al abrir la pantalla
-            aplicarModoEdicion();
-            calcularFinSuscripcion();
-        });
-
-document.addEventListener("DOMContentLoaded", function () {
-    const inicioInput = document.getElementById("InicioSuscripcion");
-    const mesesInput = document.getElementById("MesesContratados")
-    const finInput = document.getElementById("FinSuscripcion"); 
-
-    function calcularFinSuscripcion() {
-        const inicio = inicioInput.value;
-        const meses = parseInt(mesesInput.value);
-
-        if (!inicio || isNaN(meses) || meses <= 0) {
-            finInput.value = "";
-            return;
-        }
-
-        const fechaInicio = new Date(inicio + "T00:00:00");
-        fechaInicio.setMonth(fechaInicio.getMonth() + meses);
-
-        const anio = fechaInicio.getFullYear();
-        const mes = String(fechaInicio.getMonth() + 1).padStart(2, "0");
-        const dia = String(fechaInicio.getDate()).padStart(2, "0");
-
-        finInput.value = `${anio}-${mes}-${dia}`;
-    }
-
-    inicioInput.addEventListener("change", calcularFinSuscripcion);
-    mesesInput.addEventListener("input", calcularFinSuscripcion);
-
-    calcularFinSuscripcion();
+//    calcularFechaFin();
+//});
 
 
 
-});
+//document.addEventListener("DOMContentLoaded", function () {
+//    const inicioInput = document.getElementById("InicioSuscripcion");
+//    const mesesInput = document.getElementById("MesesContratados")
+//    const finInput = document.getElementById("FinSuscripcion"); 
+
+//    function calcularFinSuscripcion() {
+//        const inicio = inicioInput.value;
+//        const meses = parseInt(mesesInput.value);
+
+//        if (!inicio || isNaN(meses) || meses <= 0) {
+//            finInput.value = "";
+//            return;
+//        }
+
+//        const fechaInicio = new Date(inicio + "T00:00:00");
+//        fechaInicio.setMonth(fechaInicio.getMonth() + meses);
+
+//        const anio = fechaInicio.getFullYear();
+//        const mes = String(fechaInicio.getMonth() + 1).padStart(2, "0");
+//        const dia = String(fechaInicio.getDate()).padStart(2, "0");
+
+//        finInput.value = `${anio}-${mes}-${dia}`;
+//    }
+
+//    inicioInput.addEventListener("change", calcularFinSuscripcion);
+//    mesesInput.addEventListener("input", calcularFinSuscripcion);
+
+//    calcularFinSuscripcion();
+
+
+
+//});
