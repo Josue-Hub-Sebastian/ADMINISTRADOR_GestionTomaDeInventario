@@ -142,20 +142,45 @@ namespace Gestion_TomaInventario.Controllers
             }
         }
 
+
         public async Task<IActionResult> Dashboard(int idEmpresa)
         {
-            _logger.LogDebug("Dashboard llamado con idEmpresa: {IdEmpresa}", idEmpresa);
+ //           _logger.LogDebug("Dashboard llamado con idEmpresa: {IdEmpresa}", idEmpresa);
 
             var modelo = await _empresaService.ObtenerDashboardEmpresaAsync(idEmpresa);
 
+
             if (modelo == null)
             {
-                _logger.LogWarning("No se encontraron datos para idEmpresa: {IdEmpresa}", idEmpresa);
+                //_logger.LogWarning("No se encontraron datos para idEmpresa: {IdEmpresa}", idEmpresa);
                 return NotFound();
             }
+            modelo.Contacto = await _empresaService.ObtenerContactoEmpresaAsync(idEmpresa);
+            modelo.Contacto ??= new ContactoEmpresaViewModel
+            {
+                IdEmpresa = idEmpresa,
+                NombreEmpresa = modelo.NombreEmpresa
+            };
 
-            _logger.LogDebug("Datos cargados: {NombreEmpresa}", modelo.NombreEmpresa);
+            //_logger.LogDebug("Datos cargados: {NombreEmpresa}", modelo.NombreEmpresa);
             return View(modelo);
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> GuardarContacto(ContactoEmpresaViewModel model)
+        {
+            if(!ModelState.IsValid) return BadRequest();
+
+            var ok = await _empresaService.GuardarContactoEmpresaAsync(model);
+
+            if (!ok) return BadRequest( new { message = "No se puede guardar el contacto . "});
+
+            return Ok(new { message = "Contacto guardado correctamente ." });
+        }
+
+
+
+
     }
 }

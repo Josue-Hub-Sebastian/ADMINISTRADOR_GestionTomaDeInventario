@@ -1,0 +1,261 @@
+﻿@using Gestion_TomaInventario.Models.ViewModels
+@using Gestion_TomaInventario.Models.ViewModels.Backup
+@model IReadOnlyList<EmpresaBackupResumenViewModel>
+@{
+    ViewData["Title"] = "Gestión de Backups por Empresa";
+
+    // Métricas rápidas para la cabecera
+    int totalEmpresas = Model?.Count ?? 0;
+    int exitosos = Model?.Count(e => e.UltimoBackupEstado == "EXITOSO") ?? 0;
+    int conError = Model?.Count(e => e.UltimoBackupEstado == "ERROR") ?? 0;
+    int sinBackup = Model?.Count(e => e.UltimoBackupFecha == null) ?? 0;
+}
+
+<style>
+    /* Estilos personalizados para el panel de backups */
+    .card-backup {
+        transition: all 0.25s ease-in-out;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-left-width: 5px !important;
+    }
+
+        .card-backup:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+
+    /* Bordes dinámicos según estado */
+    .border-status-exitoso {
+        border-left-color: #198754 !important;
+    }
+
+    .border-status-error {
+        border-left-color: #dc3545 !important;
+    }
+
+    .border-status-proceso {
+        border-left-color: #ffc107 !important;
+    }
+
+    .border-status-ninguno {
+        border-left-color: #6c757d !important;
+    }
+
+    /* Icono avatar de la empresa */
+    .avatar-icon {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        font-size: 1.2rem;
+    }
+
+    /* Animación pulso para backups en proceso */
+    .pulse-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #ffc107;
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+        animation: pulse-animation 1.5s infinite;
+    }
+
+    @@keyframes pulse-animation {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 8px rgba(255, 193, 7, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+        }
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">
+            <i class="bi bi-hdd-stack-fill text-primary me-2"></i>Monitoreo de Backups
+        </h3>
+        <p class="text-muted small mb-0">Gestión centralizada de copias de seguridad de las bases de datos de clientes.</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card border-0 bg-primary bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-primary fw-bold text-uppercase small">Total Empresas</span>
+                    <h3 class="mb-0 fw-bold text-primary">@totalEmpresas</h3>
+                </div>
+                <div class="bg-primary text-white avatar-icon rounded-circle">
+                    <i class="bi bi-building"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 bg-success bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-success fw-bold text-uppercase small">Exitosos</span>
+                    <h3 class="mb-0 fw-bold text-success">@exitosos</h3>
+                </div>
+                <div class="bg-success text-white avatar-icon rounded-circle">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 bg-danger bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-danger fw-bold text-uppercase small">Con Errores</span>
+                    <h3 class="mb-0 fw-bold text-danger">@conError</h3>
+                </div>
+                <div class="bg-danger text-white avatar-icon rounded-circle">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 bg-secondary bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-bold text-uppercase small">Sin Backup</span>
+                    <h3 class="mb-0 fw-bold text-secondary">@sinBackup</h3>
+                </div>
+                <div class="bg-secondary text-white avatar-icon rounded-circle">
+                    <i class="bi bi-dash-circle-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="card border-0 shadow-sm p-5 text-center my-4">
+        <div class="mb-3">
+            <i class="bi bi-hdd-network display-1 text-muted"></i>
+        </div>
+        <h5 class="fw-bold">No se encontraron empresas registradas</h5>
+        <p class="text-muted">No existen instancias configuradas para realizar monitoreo de backups.</p>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var empresa in Model)
+        {
+            // Determinar clase de borde dinámico
+            string borderStatusClass = empresa.UltimoBackupFecha == null
+            ? "border-status-ninguno"
+            : empresa.UltimoBackupEstado switch
+            {
+                "EXITOSO" => "border-status-exitoso",
+                "ERROR" => "border-status-error",
+                "EN_PROCESO" => "border-status-proceso",
+                _ => "border-status-ninguno"
+            };
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm card-backup @borderStatusClass">
+                    <div class="card-body p-4">
+
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div>
+                                <h5 class="fw-bold mb-1 text-dark">@empresa.Nombre</h5>
+                                <span class="badge bg-light text-secondary border">
+                                    <i class="bi bi-card-heading me-1"></i>RUC: @empresa.Ruc
+                                </span>
+                            </div>
+                            <div class="avatar-icon bg-light text-primary border">
+                                <i class="bi bi-database-fill-gear"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-light rounded-3 p-3 mb-3">
+                            <div class="d-flex align-items-center mb-1">
+                                <i class="bi bi-database text-primary me-2"></i>
+                                <span class="text-muted small me-1">BD:</span>
+                                <code class="fw-bold text-dark fs-7">@empresa.NombreBD</code>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-server text-secondary me-2"></i>
+                                <span class="text-muted small me-1">Servidor:</span>
+                                <span class="text-dark small text-truncate" style="max-width: 180px;" title="@empresa.ServidorSql">
+                                    @empresa.ServidorSql
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between pt-1">
+                            <span class="text-muted small fw-semibold">Última Copia:</span>
+                            <div>
+                                @if (empresa.UltimoBackupFecha == null)
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-1">
+                                        <i class="bi bi-dash-circle me-1"></i>Sin registros
+                                    </span>
+                                }
+                                else
+                                {
+                                    @switch (empresa.UltimoBackupEstado)
+                                    {
+                                        case "EXITOSO":
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">
+                                                <i class="bi bi-check-circle-fill me-1"></i>EXITOSO
+                                            </span>
+                                            break;
+
+                                        case "ERROR":
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">
+                                                <i class="bi bi-x-circle-fill me-1"></i>ERROR
+                                            </span>
+                                            break;
+
+                                        case "EN_PROCESO":
+                                            <span class="badge bg-warning bg-opacity-10 text-dark border border-warning border-opacity-25 px-2 py-1">
+                                                <span class="pulse-dot me-1"></span>EN PROCESO
+                                            </span>
+                                            break;
+
+                                        default:
+                                            <span class="badge bg-light text-dark border px-2 py-1">
+                                                @empresa.UltimoBackupEstado
+                                            </span>
+                                            break;
+                                    }
+
+                                    <div class="text-muted text-end small mt-1" style="font-size: 0.78rem;">
+                                        <i class="bi bi-clock me-1"></i>@empresa.UltimoBackupFecha.Value.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer bg-light border-0 px-4 py-3 d-flex justify-content-between align-items-center">
+                        <a asp-action="Configurar" asp-route-idEmpresa="@empresa.IdEmpresa" class="btn btn-sm btn-primary px-3 rounded-2 shadow-sm">
+                            <i class="bi bi-gear-fill me-1"></i> Configurar
+                        </a>
+                        <a asp-action="Historial" asp-route-idEmpresa="@empresa.IdEmpresa" class="btn btn-sm btn-outline-secondary px-3 rounded-2">
+                            <i class="bi bi-clock-history me-1"></i> Historial
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -36,5 +36,15 @@ namespace Gestion_TomaInventario.Services.EmpresaServ
         {
             return _empresaRepository.ListarPlanesActivosAsync();
         }
+
+        public Task<ContactoEmpresaViewModel?> ObtenerContactoEmpresaAsync(int idEmpresa)
+        {
+            return _empresaRepository.ObtenerContactoEmpresaAsync(idEmpresa);
+        }
+
+        public Task<bool> GuardarContactoEmpresaAsync(ContactoEmpresaViewModel model)
+        {
+            return _empresaRepository.GuardarContactoEmpresa(model);
+        }
     }
 }

@@ -15,5 +15,9 @@ namespace Gestion_TomaInventario.Repository.EmpresaRepo
         //canelita: 2024-06-19: Se agrega el método ListarPlanesActivosAsync para obtener los planes activos de la empresa, usando el ViewModel PlanDropdownViewModel como DTO para el combo box.
         Task<IReadOnlyList<PlanDropdownViewModel>> ListarPlanesActivosAsync();
 
+
+        //contacto
+        Task<ContactoEmpresaViewModel?> ObtenerContactoEmpresaAsync(int idEmpresa);
+        Task<bool> GuardarContactoEmpresa(ContactoEmpresaViewModel model);
     }
 }
