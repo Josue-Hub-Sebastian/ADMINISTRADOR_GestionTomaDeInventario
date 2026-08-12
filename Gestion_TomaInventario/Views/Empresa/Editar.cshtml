@@ -33,11 +33,7 @@
         </a>
     </div>
 
-    <!-- ============================================
-         MINI CARDS INFORMATIVAS
-         ============================================ -->
     <div class="row g-3 mb-4 fade-in-up">
-
         <!-- Card: Empresa -->
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="card mini-card shadow-sm h-100">
@@ -113,8 +109,7 @@
         <input type="hidden" asp-for="IdEmpresa" />
 
         <div class="row g-4">
-
-            <!-- COLUMNA IZQUIERDA: Datos de Empresa y Estado -->
+            <!--doble columnas-->
             <div class="col-lg-4 fade-in-up">
                 <div class="card card-licencia shadow-sm border-0 h-100">
                     <div class="card-header card-header-gradient secondary py-3">
@@ -164,9 +159,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- COLUMNA DERECHA: Límites y Restricciones -->
-           
+            <!--Separacion de columnas-->
             <div class="col-lg-8 fade-in-up">
                 <div class="card card-licencia shadow-sm border-0 h-100">
                     <div class="card-header card-header-gradient py-3">
@@ -180,10 +173,6 @@
                             <i class="bi bi-info-circle me-1"></i>
                             Establece los topes máximos permitidos para este clon. El sistema de negocio (BL) validará estas cantidades de manera síncrona.
                         </p>
-
-                        <!-- =========================
-                             SELECCIÓN DE PLAN
-                        ========================== -->
                         <div class="card border-0 bg-light mb-4">
                             <div class="card-body">
                                 <h6 class="fw-bold mb-3">
@@ -195,7 +184,7 @@
                                     <div class="col-md-8">
                                         <label asp-for="IdPlan" class="form-label fw-semibold">Plan de licencia</label>
                                         <select asp-for="IdPlan" class="form-select" id="IdPlan">
-                                            <option value="">-- Seleccione un plan --</option>
+                                            <option value="" disabled hidden>-- Seleccione un plan --</option>
 
                                             @foreach (var plan in Model.ListaPlanes)
                                             {
@@ -234,10 +223,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- =========================
-                             VIGENCIA DEL PLAN
-                        ========================== -->
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label asp-for="InicioSuscripcion" class="form-label fw-semibold">
@@ -281,9 +266,6 @@
                             </div>
                         </div>
 
-                        <!-- =========================
-                             LIMITES
-                        ========================== -->
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <label asp-for="ProductosMax" class="form-label fw-semibold">Máximo de Productos</label>

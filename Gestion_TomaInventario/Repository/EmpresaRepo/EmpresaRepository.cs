@@ -432,6 +432,72 @@ namespace Gestion_TomaInventario.Repository.EmpresaRepo
 
             return lista;
         }
+        //fusion entre mi codigo y el de la ia xd
+        public async Task<ContactoEmpresaViewModel?> ObtenerContactoEmpresaAsync(int idEmpresa)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException("No se encontró la cadena de conexión.");
+
+            using var conexion = new SqlConnection(connectionString);
+            using var cmd = new SqlCommand(StoredProcedures.ObtenerContactoEmpresa, conexion);
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandTimeout = 120;
+
+            cmd.Parameters.Add(new SqlParameter("@IdEmpresa", SqlDbType.Int)
+            {
+                Value = idEmpresa
+            });
+
+            await conexion.OpenAsync();
+
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            if (!await reader.ReadAsync())
+                return null;
+
+            return new ContactoEmpresaViewModel
+            {
+                IdEmpresa = Convert.ToInt64(reader["IdEmpresa"]),
+                IdContacto = Convert.ToInt64(reader["IdContacto"]),
+                NombreContacto = reader["NombreContacto"].ToString(),
+                TelefonoContacto = reader["TelefonoContacto"].ToString(),
+                CorreoContacto = reader["CorreoContacto"].ToString(),
+                Estado = Convert.ToBoolean(reader["Estado"]),
+                FechaRegistro = Convert.ToDateTime(reader["FechaRegistro"]),
+                FechaActualizacion = reader["FechaActualizacion"] == DBNull.Value
+                    ? null
+                    : Convert.ToDateTime(reader["FechaActualizacion"])
+            };
+        }
+
+
+        public async Task<bool> GuardarContactoEmpresa(ContactoEmpresaViewModel model)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException("No se encontro la cadena de Conexion");
+
+            using var conexion = new SqlConnection(connectionString);
+            using var cmd = new SqlCommand(StoredProcedures.GuardarContactoEmpresa, conexion);
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandTimeout = 120;
+
+            cmd.Parameters.Add(new SqlParameter("@idEmpresa", SqlDbType.BigInt){ Value = model.IdEmpresa });
+            cmd.Parameters.Add(new SqlParameter("@nombreContacto", SqlDbType.VarChar,150) { Value = model.NombreContacto });
+            cmd.Parameters.Add(new SqlParameter("@telefonoContacto", SqlDbType.VarChar,20) { Value = model.TelefonoContacto });
+            cmd.Parameters.Add(new SqlParameter("@correoContacto", SqlDbType.VarChar,150) { Value =(object?) model.CorreoContacto ?? DBNull.Value });
+
+            await conexion.OpenAsync();
+            int resultado = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+
+            return resultado == 1;
+            
+        }
     }
 }
 
