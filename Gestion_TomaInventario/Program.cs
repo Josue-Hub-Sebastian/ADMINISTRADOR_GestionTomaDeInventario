@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Gestion_TomaInventario.Repository.BackUpRepo;
 using Gestion_TomaInventario.Services.BackupServ;
 using Gestion_TomaInventario.Services.BackUpManager;
+using Gestion_TomaInventario.Services.ColaSincronizacionServ;
+using Gestion_TomaInventario.Repository.ColaSincronizadoRepo;
 using Gestion_TomaInventario.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +25,10 @@ builder.Services.AddScoped<IPlanService, PlanService>();
 builder.Services.AddScoped<IBackupRepository,BackupRepository>();
 builder.Services.AddScoped<IBackupService,BackupService>();
 builder.Services.AddScoped<IBackupManager,BackupManager>();
-builder.Services.AddHostedService<BackupHostedService>();// aqui la logica de la hora dia mes para calular el backup :v
+builder.Services.AddScoped<IColaSincronizacionRepository, ColaSincronizacionRepository>();
+builder.Services.AddScoped<IColaSincronizacionService, ColaSincronizacionService>();
+builder.Services.AddHostedService<SyncHostedService>();// aqui la logica de la hora dia mes para calular el backup :v ;// aqui la logica de la hora dia mes para calular el backup :v
+builder.Services.AddHostedService<BackupHostedService>();// aqui la logica de la hora dia mes para calular el backup :v ;// aqui la logica de la hora dia mes para calular el backup :v
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
