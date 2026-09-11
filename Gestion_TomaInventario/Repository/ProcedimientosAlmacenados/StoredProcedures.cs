@@ -43,5 +43,6 @@ namespace Gestion_TomaInventario.Repository.ProcedimientosAlmacenados
         public const string GuardarContactoEmpresa = "SP_CONTACTO_GUARDAR";
         #endregion
 
+
     }
 }
